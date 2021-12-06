@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using boschBeneficios.Models;
+using webAPI.Models;
 
-namespace boschBeneficios.DAO
+namespace webAPI.DAO
 {
     public partial class BOSHBENEFICIOContext : DbContext
     {
@@ -30,8 +30,8 @@ namespace boschBeneficios.DAO
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Integrated Security=SSPI;Persist Security Info=False;Data Source=DESKTOP-32E79I2;Initial Catalog=BOSHBENEFICIO");
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Integrated Security=SSPI;Persist Security Info=False;Data Source=desktop-asp7hdm;Initial Catalog=BOSHBENEFICIO");
             }
         }
 
@@ -40,7 +40,7 @@ namespace boschBeneficios.DAO
             modelBuilder.Entity<Beneficiario>(entity =>
             {
                 entity.HasKey(e => e.IdBeneficiario)
-                    .HasName("PK__Benefici__09162CD1A726F855");
+                    .HasName("PK__Benefici__09162CD1817DC479");
 
                 entity.ToTable("Beneficiario");
 
@@ -122,7 +122,7 @@ namespace boschBeneficios.DAO
             modelBuilder.Entity<Beneficio>(entity =>
             {
                 entity.HasKey(e => e.IdBeneficio)
-                    .HasName("PK__Benefici__00AAC26A625609EF");
+                    .HasName("PK__Benefici__00AAC26A4746E772");
 
                 entity.ToTable("Beneficio");
 
@@ -139,7 +139,7 @@ namespace boschBeneficios.DAO
             modelBuilder.Entity<Evento>(entity =>
             {
                 entity.HasKey(e => e.IdEvento)
-                    .HasName("PK__Evento__C8DC7BDA9BECAE70");
+                    .HasName("PK__Evento__C8DC7BDAA64D1C18");
 
                 entity.ToTable("Evento");
 
@@ -197,7 +197,7 @@ namespace boschBeneficios.DAO
             modelBuilder.Entity<Ilha>(entity =>
             {
                 entity.HasKey(e => e.IdIlha)
-                    .HasName("PK__Ilha__B6CB724E11AF6685");
+                    .HasName("PK__Ilha__B6CB724ED4375913");
 
                 entity.ToTable("Ilha");
 
@@ -236,11 +236,11 @@ namespace boschBeneficios.DAO
             modelBuilder.Entity<Terceiro>(entity =>
             {
                 entity.HasKey(e => e.IdTerceiro)
-                    .HasName("PK__Terceiro__E6216494F7D1434E");
+                    .HasName("PK__Terceiro__E621649410F9B6F1");
 
                 entity.ToTable("Terceiro");
 
-                entity.HasIndex(e => e.Identificacao, "UQ__Terceiro__C8F7C76B57E4285F")
+                entity.HasIndex(e => e.Identificacao, "UQ__Terceiro__C8F7C76B693A4546")
                     .IsUnique();
 
                 entity.Property(e => e.IdTerceiro)
@@ -266,5 +266,10 @@ namespace boschBeneficios.DAO
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        
+        // METODOS
+        
     }
+
+    
 }

@@ -1,27 +1,40 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using webAPI.DAO;
+using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+string  connString = builder.Configuration.GetConnectionString("conexaobd");
+builder.Services.AddDbContext<BOSHBENEFICIOContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("conexaobd"));
+
+});
+builder.Services.AddScoped<IRepository,Repository>();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-IServiceCollection serviceCollection = builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "BoschBeneficios",
-        Description = "App para Eventos Bosch",        
+        Title = "WebApi Grupo4 Bosch",
+        Description = "Back-End para Api Grupo4 Bosch",        
         Contact = new OpenApiContact
         {
-            Name = "Grupo 04 Bosch - Git",
-            Url = new Uri("https://github.com/Boshprocesso/")      
+            Name = "Grupo04",
+            Url = new Uri("https://example.com/contact")
         },
         License = new OpenApiLicense
         {
-            Name = "Uso Exclusivo Bosch",
+            Name = "Example License",
             Url = new Uri("https://example.com/license")
         }
     });
@@ -43,3 +56,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

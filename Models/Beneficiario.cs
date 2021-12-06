@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
-namespace boschBeneficios.Models
+namespace webAPI.Models
 {
     public partial class Beneficiario
     {
