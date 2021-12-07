@@ -6,7 +6,7 @@ namespace webAPI.DAO
     public interface IRepository
     {
         Task<bool> SaveChangesAsync();
-        Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao);
+        Task<dynamic> GetBeneficiosParaEntregar(string identificacao);
         void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
         Task<Beneficiario[]> GetAllBeneficiarios();
 
