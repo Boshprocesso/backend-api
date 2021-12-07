@@ -6,5 +6,6 @@ namespace webAPI.DAO
     public interface IRepository
     {
          Task<Beneficiario[]> GetBeneficiarios();
+         Task<Object[]> getBeneficiarioBeneficios(string identificacao);
     }
 }
