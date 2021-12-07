@@ -12,6 +12,6 @@ namespace webAPI.DAO
 
          Task<dynamic> GetBeneficoFromEvento(Guid EventoId);
 
-         //Task RemoverEvento(Guid EventoId);
+         Task RemoverEvento(Guid EventoId);
     }
 }

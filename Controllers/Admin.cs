@@ -51,6 +51,19 @@ namespace webAPI.Controllers
             }
             
         }
+
+        [HttpGet("DeleteEvento/{EventoId}")]
+        public async Task<IActionResult> DeleteEvento(Guid EventoId)
+        {
+            try{
+                await _repo.RemoverEvento(EventoId);
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
     }
 
 }

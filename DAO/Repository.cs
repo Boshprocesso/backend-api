@@ -52,7 +52,7 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();    
         }
 
-        /*public async Task RemoverEvento(Guid EventoId){
+        public async Task RemoverEvento(Guid EventoId){
 
             IQueryable<Evento> consulta = _context.Eventos; 
             
@@ -61,11 +61,10 @@ namespace webAPI.DAO
             select c).FirstOrDefault();
 
             if (busca != null){
-                consulta.Remove();
-            }
-
-
-        }*/
+                _context.Eventos.Remove(busca);
+                await _context.SaveChangesAsync();
+                }
+        }
 
 
     }
