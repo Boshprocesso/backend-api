@@ -33,12 +33,12 @@ namespace webAPI.DAO
 
         public async Task<dynamic> GetBeneficosFromEvento(Guid EventoId){
 
-            IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
-            IQueryable<Beneficio> benefconsulta = _context.Beneficios;
+            IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
+            IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
 
             var query = (
-                from b in benefconsulta                
-                join eb in consulta on b.IdBeneficio equals eb.IdBeneficio
+                from b in benefconsultabb                
+                join eb in consultabb on b.IdBeneficio equals eb.IdBeneficio
                 where eb.IdEvento == EventoId
                 select new  {
                     IdEvento = eb.IdEvento,
@@ -52,12 +52,12 @@ namespace webAPI.DAO
 
         public async Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
 
-            IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
-            IQueryable<Beneficio> benefconsulta = _context.Beneficios;
+            IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
+            IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
 
             var query = (
-                from b in benefconsulta                
-                join eb in consulta on b.IdBeneficio equals eb.IdBeneficio
+                from b in benefconsultabb                
+                join eb in consultabb on b.IdBeneficio equals eb.IdBeneficio
                 where eb.IdEvento == EventoId &&
                 eb.IdBeneficio == BeneficioId
                 select new  {
@@ -74,9 +74,9 @@ namespace webAPI.DAO
 
          public async Task<dynamic> GetEventobyId(Guid EventoId){
         
-            IQueryable<Evento> consulta = _context.Eventos;
+            IQueryable<Evento> consultabb = _context.Eventos;
 
-            var resposta = (from c in consulta
+            var resposta = (from c in consultabb
                             where c.IdEvento == EventoId
                             select new {
                             nomeEvento = c.NomeEvento,
@@ -91,9 +91,9 @@ namespace webAPI.DAO
 
          public async Task<dynamic> GetEvento(Evento evento){
 
-             IQueryable<Evento> consulta = _context.Eventos;
+             IQueryable<Evento> consultabb = _context.Eventos;
 
-             var resposta = (from c in consulta
+             var resposta = (from c in consultabb
                             where c.NomeEvento == evento.NomeEvento &&
                             c.DataInicio == evento.DataInicio &&
                             c.DataTermino == evento.DataTermino
@@ -106,9 +106,9 @@ namespace webAPI.DAO
 
         public async Task RemoverEvento(Guid EventoId){
 
-            IQueryable<Evento> consulta = _context.Eventos; 
+            IQueryable<Evento> consultabb = _context.Eventos; 
             
-            var busca = (from c in consulta
+            var busca = (from c in consultabb
             where c.IdEvento == EventoId
             select c).FirstOrDefault();               
             _context.Eventos.Remove(busca);
@@ -124,9 +124,9 @@ namespace webAPI.DAO
 
         public async Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
 
-            IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
+            IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
             
-            var busca = (from c in consulta
+            var busca = (from c in consultabb
             where c.IdEvento == EventoId &&
             c.IdBeneficio == BeneficioId
             select c).FirstOrDefault();               
@@ -138,12 +138,14 @@ namespace webAPI.DAO
 
         public async Task<dynamic> GetLogin(Login login)
         {
-            IQueryable<Beneficiario> consulta = _context.Beneficiarios;
-            var data = (from Beneficiario in consulta where Beneficiario.Cpf == login.cod select Beneficiario.DataNascimento);
+            IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
+            var data = (from Beneficiario in consultabb 
+                        where Beneficiario.Cpf == login.cod 
+                        select Beneficiario.DataNascimento);
             var nascimentoLogin = login.nascimento.Split('-');
             Array.Reverse(nascimentoLogin);
             if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
-            var query = (from beneficiario in consulta
+            var query = (from beneficiario in consultabb
                         where beneficiario.Cpf == login.cod
                         select new 
                         {
@@ -158,6 +160,33 @@ namespace webAPI.DAO
             return null;
         }
 
+        public async Task<dynamic> GetBeneficios(string cod)
+        {
+            IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
+            IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios;
+            IQueryable<Beneficio> Beneficios = _context.Beneficios;
+            var id = (from beneficiario in Beneficiarios
+                    where beneficiario.Cpf == cod
+                    select beneficiario.IdBeneficiario);
+            var queryBeneficios = (from bb in BeneficiarioBeneficios
+                        join b in Beneficios on bb.IdBeneficio equals b.IdBeneficio
+                        where bb.IdBeneficiario == id.FirstOrDefault()
+                        select new{
+                            idProduto = b.IdBeneficio,
+                            beneficio = b.DescricaoBeneficio,
+                            status = bb.Entregue,
+                            quantidade = bb.Quantidade
+                        });
+            var query = from beneficiario in Beneficiarios
+                        where beneficiario.IdBeneficiario == id.FirstOrDefault()
+                        select new{
+                            codFuncionario = cod,
+                            nomeFuncionario = beneficiario.NomeCompleto,
+                            beneficios = queryBeneficios.ToArray()
+                        };
+
+            return await query.ToArrayAsync();
+        }
     }
     
 }

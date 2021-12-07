@@ -25,5 +25,6 @@ namespace webAPI.DAO
          Task inserirEvento(Evento evento);
 
          Task<dynamic> GetLogin(Login login);
+         Task<dynamic> GetBeneficios(string cpf);
     }
 }
