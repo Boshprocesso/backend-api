@@ -90,10 +90,27 @@ namespace webAPI.Controllers
             try{
 
                 
-                var result = await _repo.GetUmBeneficioFromEvento(EventoId,BeneficioId);
+                var result = await _repo.GetUmBeneficioFromEventobyId(EventoId,BeneficioId);
                 await _repo.RemoverUmBeneficioFromEvento(EventoId,BeneficioId);
                 
                 return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpPost("adicionarBeneficioEvento")]
+        public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio)
+        {
+            try{
+
+                await _repo.inserirBeneficio(beneficio);
+                await _repo.inserirBeneficioEvento(EventoId,beneficio);                
+                var result = await _repo.GetUmBeneficioFromEvento(EventoId,beneficio);
+                
+                return Ok();
             }
             catch (Exception ex){
                 return BadRequest($"Erro: {ex.Message}");
