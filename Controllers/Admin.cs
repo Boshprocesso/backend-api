@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using webAPI.DAO;
 using System.Threading.Tasks;
+using webAPI.Models;
 namespace webAPI.Controllers
 {
     
@@ -39,11 +40,11 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpGet("byEventoId/{EventoId}")]
+        [HttpGet("beneficioEvento/{EventoId}")]
         public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
         {
             try{
-                var result = await _repo.GetBeneficoFromEvento(EventoId);
+                var result = await _repo.GetBeneficosFromEvento(EventoId);
                 return Ok(result);
             }
             catch (Exception ex){
@@ -52,17 +53,51 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpGet("DeleteEvento/{EventoId}")]
+        [HttpDelete("deleteEvento/{EventoId}")]
         public async Task<IActionResult> DeleteEvento(Guid EventoId)
         {
             try{
+                var result = await _repo.GetEventobyId(EventoId);
                 await _repo.RemoverEvento(EventoId);
-                return Ok();
+                return Ok(result);
             }
             catch (Exception ex){
                 return BadRequest($"Erro: {ex.Message}");
             }
-            
+                        
+        }
+
+        [HttpPost("adicionarEvento")]
+        public async Task<IActionResult> AddEvento(Evento evento)
+        {
+            try{
+
+                await _repo.inserirEvento(evento);
+                var result = await _repo.GetEvento(evento);
+                
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpDelete("deleteBeneficioEvento/{EventoId}/{BeneficioId}")]
+        public async Task<IActionResult> DeletarBeneficioFromEvento(Guid EventoId, Guid BeneficioId)
+        {
+            try{
+
+                
+                var result = await _repo.GetUmBeneficioFromEvento(EventoId,BeneficioId);
+                await _repo.RemoverUmBeneficioFromEvento(EventoId,BeneficioId);
+                
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
         }
     }
 

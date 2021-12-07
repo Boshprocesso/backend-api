@@ -10,8 +10,17 @@ namespace webAPI.DAO
 
          Task<Evento[]> GetAllEventos();
 
-         Task<dynamic> GetBeneficoFromEvento(Guid EventoId);
+         Task<dynamic> GetBeneficosFromEvento(Guid EventoId);
+
+         Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId);
+
+         Task<dynamic> GetEventobyId(Guid EventoId);
 
          Task RemoverEvento(Guid EventoId);
+         Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId);
+
+         Task<dynamic> GetEvento(Evento evento);
+
+         Task inserirEvento(Evento evento);
     }
 }
