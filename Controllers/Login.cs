@@ -25,7 +25,7 @@ namespace webAPI.Controllers
                 {
                     return Ok(result);
                 }
-                return BadRequest("deu ruim");  
+                return BadRequest(null);  
             }
             catch (Exception ex){
                 return BadRequest($"Erro: {ex.Message}");
