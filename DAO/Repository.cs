@@ -83,7 +83,9 @@ namespace webAPI.DAO
                         {
                             codFuncionario = beneficiario.Cpf,
                             nomeFuncionario = beneficiario.NomeCompleto,
-                            nascimento = beneficiario.DataNascimento
+                            nascimento = beneficiario.DataNascimento,
+                            administrativo = true,
+                            entregaproduto = true
                         });
                 return await query.ToArrayAsync();
             }
