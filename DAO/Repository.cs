@@ -24,17 +24,30 @@ namespace webAPI.DAO
                 Guid idTerceiro, idBeneficiario;
                 
                 try {
-                    idBeneficiario = 
-                        (from beneficiario in _context.Beneficiarios
+                    if(identificacao.Length < 14) {
+                        idBeneficiario = 
+                        (from beneficiario in _context.Beneficiarios.AsNoTracking()
                         where beneficiario.Edv == Convert.ToInt32(identificacao)
                         select beneficiario.IdBeneficiario).First();
+                    }else {
+                        idBeneficiario = 
+                            (from beneficiario in _context.Beneficiarios.AsNoTracking()
+                            where beneficiario.Cpf == identificacao
+                            select beneficiario.IdBeneficiario).First();
+                    }
                 } catch {
                     idBeneficiario = Guid.Empty;
                 }
                 
                 try {
+                    if(identificacao.Length < 14) {
+                        identificacao = 
+                        (from beneficiario in _context.Beneficiarios.AsNoTracking()
+                        where beneficiario.Edv == Convert.ToInt32(identificacao)
+                        select beneficiario.Cpf).First();
+                    }
                     idTerceiro = 
-                        (from terceiro in _context.Terceiros
+                        (from terceiro in _context.Terceiros.AsNoTracking()
                         where terceiro.Identificacao == identificacao
                         select terceiro.IdTerceiro).First();
                 } catch {
@@ -42,7 +55,7 @@ namespace webAPI.DAO
                 }
 
                 IQueryable<Object> query =
-                from beneficiario in _context.Beneficiarios
+                from beneficiario in _context.Beneficiarios.AsNoTracking()
                 join beneficiarioBeneficio in _context.BeneficiarioBeneficios
                 on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
                 join beneficio in _context.Beneficios
