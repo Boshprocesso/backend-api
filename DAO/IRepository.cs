@@ -6,24 +6,30 @@ namespace webAPI.DAO
     public interface IRepository
     {
         Task<bool> SaveChangesAsync();
-         Task<Beneficiario[]> GetAllBeneficiarios();
+        Task<Beneficiario[]> GetAllBeneficiarios();
 
-         Task<Evento[]> GetAllEventos();
+        Task<Evento[]> GetAllEventos();
 
-         Task<dynamic> GetBeneficosFromEvento(Guid EventoId);
+        Task<dynamic> GetBeneficosFromEvento(Guid EventoId);
 
-         Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId);
+        Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId);
 
-         Task<dynamic> GetEventobyId(Guid EventoId);
+        Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Beneficio beneficio);
 
-         Task RemoverEvento(Guid EventoId);  
+        Task<dynamic> GetEventobyId(Guid EventoId);
 
-         Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId);       
+        Task RemoverEvento(Guid EventoId);  
 
-         Task<dynamic> GetEvento(Evento evento);
+        Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId);       
 
-         Task inserirEvento(Evento evento);
+        Task<dynamic> GetEvento(Evento evento);
 
-         Task<dynamic> GetLogin(Login login);
+        Task inserirEvento(Evento evento);
+
+        Task inserirBeneficio(Beneficio beneficio);
+
+        Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio);
+
+        Task <dynamic> GetLogin(Login login);
     }
 }

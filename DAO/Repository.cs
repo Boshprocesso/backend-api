@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using webAPI.Models;
 
+
 namespace webAPI.DAO
 {
     public class Repository : IRepository
@@ -50,7 +51,7 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();    
         }
 
-        public async Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
+        public async Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId){
 
             IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
             IQueryable<Beneficio> benefconsulta = _context.Beneficios;
@@ -69,6 +70,32 @@ namespace webAPI.DAO
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);         
             return await query.ToArrayAsync();
 
+
+        }
+
+        public async Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Beneficio beneficio){
+
+            IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
+            IQueryable<Beneficio> benefconsulta = _context.Beneficios;
+
+            var busca = (
+                from b in benefconsulta
+                where b.DescricaoBeneficio == beneficio.DescricaoBeneficio                
+                select b.IdBeneficio).First();
+
+                var query = (
+                from b in benefconsulta                
+                join eb in consulta on b.IdBeneficio equals eb.IdBeneficio
+                where eb.IdEvento == EventoId &&
+                eb.IdBeneficio == busca
+                select new  {
+                    IdEvento = eb.IdEvento, 
+                    IdBeneficio = b.IdBeneficio,
+                    descricaoBeneficio = b.DescricaoBeneficio
+                });
+
+            query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);         
+            return await query.ToArrayAsync();
 
         }
 
@@ -120,6 +147,30 @@ namespace webAPI.DAO
             _context.Eventos.Add(evento);
             await _context.SaveChangesAsync();
 
+        }
+
+        public async Task inserirBeneficio(Beneficio beneficio){
+
+            _context.Beneficios.Add(beneficio);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio){
+
+            IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
+            IQueryable<Beneficio> benefconsulta = _context.Beneficios;
+
+           var query = (
+                from b in benefconsulta        
+                where b.DescricaoBeneficio == beneficio.DescricaoBeneficio 
+                select b.IdBeneficio).First();
+
+            EventoBeneficio ev = new EventoBeneficio();
+            ev.IdEvento = EventoId;
+            ev.IdBeneficio = query;
+
+            _context.EventoBeneficios.Add(ev);
+            
         }
 
         public async Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
