@@ -5,6 +5,11 @@ namespace webAPI.DAO
 {
     public interface IRepository
     {
-         Task<Beneficiario[]> GetBeneficiarios();
+         Task<Beneficiario[]> GetAllBeneficiarios();
+
+         Task<Evento[]> GetAllEventos();
+
+         Task<EventoBeneficio[]> GetBeneficoFromEvento(Guid EventoId);
+
     }
 }

@@ -5,7 +5,7 @@ namespace webAPI.Controllers
 {
     
     [ApiController]
-    [Route("admin/[controller]")]
+    [Route("[controller]")]
     public class AdminController : ControllerBase
     {        
 
@@ -15,10 +15,35 @@ namespace webAPI.Controllers
             _repo = repo;
         }
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetBeneficiarios()
         {
             try{
-                var result = await _repo.GetBeneficiarios();
+                var result = await _repo.GetAllBeneficiarios();
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+        [HttpGet("/evento")]
+        public async Task<IActionResult> GetEvento()
+        {
+            try{
+                var result = await _repo.GetAllEventos();
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+        [HttpGet("byEventoId/{EventoId}")]
+        public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
+        {
+            try{
+                var result = await _repo.GetBeneficoFromEvento(EventoId);
                 return Ok(result);
             }
             catch (Exception ex){
