@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using webAPI.DAO;
 using System.Threading.Tasks;
+using webAPI.Models;
 
 namespace webAPI.Controllers
 {
@@ -16,21 +17,44 @@ namespace webAPI.Controllers
             _repo = repo;
         }
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery(Name="identificacao")] string? identificacao)
+        public async Task<IActionResult> GetBeneficiosParaEntregar([FromQuery(Name="identificacao")] string? identificacao)
         {
             if(identificacao == null)
             {
                 return StatusCode(400, "Informe a identificação");
             }
-            
+
             try{
-                var result = await _repo.getBeneficiarioBeneficios(identificacao);
+                var result = await _repo.GetBeneficiosParaEntregar(identificacao);
                 return Ok(result);
             }
             catch (Exception ex){
                 return StatusCode(500 , $"Erro: {ex.Message}");
             }
             
+        }
+        
+        [HttpPost("entregar")]
+        public async Task<IActionResult> entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
+        {
+            if(beneficiosEntregues.Count == 0)
+            {
+                return StatusCode(400, "Informe ao menos um benefício para entregua");
+            }
+            
+            try{
+                _repo.entregarBeneficios(beneficiosEntregues);
+
+                if(await _repo.SaveChangesAsync())
+                {
+                    return Ok("Beneficios entregues");
+                }
+            }
+            catch (Exception ex){
+                return StatusCode(500 , $"Erro: {ex.Message}");
+            }
+
+            return BadRequest("Esses benefícios já foram entregues");            
         }
     }
 
