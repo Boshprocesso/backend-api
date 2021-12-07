@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
+using backend_api.Models;
 using webAPI.Models;
 
 namespace webAPI.DAO
 {
     public interface IRepository
     {
+
         Task<bool> SaveChangesAsync();
          Task<Beneficiario[]> GetAllBeneficiarios();
 
@@ -13,5 +15,8 @@ namespace webAPI.DAO
          Task<dynamic> GetBeneficoFromEvento(Guid EventoId);
 
          //Task RemoverEvento(Guid EventoId);
+
+         Task<dynamic> GetLogin(Login login);
+
     }
 }
