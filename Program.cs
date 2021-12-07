@@ -12,6 +12,7 @@ builder.Services.AddDbContext<BOSHBENEFICIOContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("conexaobd"));
 
+
 });
 builder.Services.AddScoped<IRepository,Repository>();
 // Add services to the container.
