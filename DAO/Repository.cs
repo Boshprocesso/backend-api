@@ -76,7 +76,9 @@ namespace webAPI.DAO
         {
             IQueryable<Beneficiario> consulta = _context.Beneficiarios;
             var data = (from Beneficiario in consulta where Beneficiario.Cpf == login.cod select Beneficiario.DataNascimento);
-            if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == login.nascimento){
+            var nascimentoLogin = login.nascimento.Split('-');
+            Array.Reverse(nascimentoLogin);
+            if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
             var query = (from beneficiario in consulta
                         where beneficiario.Cpf == login.cod
                         select new 
