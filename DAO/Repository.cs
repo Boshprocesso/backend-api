@@ -23,6 +23,7 @@ namespace webAPI.DAO
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficiario);
             return await query.ToArrayAsync();
         }
+
         public async Task<Evento[]> GetAllEventos()
         {
             IQueryable<Evento> query = _context.Eventos;
@@ -133,6 +134,29 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();         
         }
 
+
+
+        public async Task<dynamic> GetLogin(Login login)
+        {
+            IQueryable<Beneficiario> consulta = _context.Beneficiarios;
+            var data = (from Beneficiario in consulta where Beneficiario.Cpf == login.cod select Beneficiario.DataNascimento);
+            var nascimentoLogin = login.nascimento.Split('-');
+            Array.Reverse(nascimentoLogin);
+            if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
+            var query = (from beneficiario in consulta
+                        where beneficiario.Cpf == login.cod
+                        select new 
+                        {
+                            codFuncionario = beneficiario.Cpf,
+                            nomeFuncionario = beneficiario.NomeCompleto,
+                            nascimento = beneficiario.DataNascimento,
+                            administrativo = true,
+                            entregaproduto = true
+                        });
+                return await query.ToArrayAsync();
+            }
+            return null;
+        }
 
     }
     
