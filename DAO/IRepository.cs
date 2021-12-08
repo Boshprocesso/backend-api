@@ -41,5 +41,7 @@ namespace webAPI.DAO
         Task<List<Beneficiario>> carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
 
         Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios);
+
+        void carregarBeneficioBeneficiarios(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
     }
 }

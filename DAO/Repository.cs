@@ -365,6 +365,30 @@ namespace webAPI.DAO
 
             return listaBeneficios;
         }
+
+        public void carregarBeneficioBeneficiarios(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario)
+        {
+            int count = 0;
+            foreach (KeyValuePair<string, List<CpfQuantidade>> entrada in BeneficioBeneficiario)
+            {
+                Beneficio beneficio = Beneficios.Where(b => b.DescricaoBeneficio == entrada.Key).First();
+
+                foreach (CpfQuantidade cpfQuantidade in entrada.Value)
+                {
+                    Beneficiario beneficiario = Beneficiarios.Where(b => b.Cpf == cpfQuantidade.cpf).First();
+
+                    BeneficiarioBeneficio beneficiarioBeneficio = new BeneficiarioBeneficio {
+                        IdBeneficiario = beneficiario.IdBeneficiario,
+                        IdBeneficio = beneficio.IdBeneficio,
+                        Quantidade = cpfQuantidade.Quantidade
+                    };
+
+                    _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                    count++;
+                }
+            }
+            Console.WriteLine("Contador: " + count);
+        }
     }
     
 }

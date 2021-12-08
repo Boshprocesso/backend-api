@@ -34,16 +34,18 @@ namespace webAPI.Controllers
                  List<Beneficiario> beneficiarios = await _repo.carregarBeneficiarios(payload.Beneficiarios);
                  List<Beneficio> beneficios = await _repo.carregarBeneficios(payload.Beneficios);
 
-                /* if(await _repo.SaveChangesAsync())
-                { */
+                _repo.carregarBeneficioBeneficiarios(beneficios, beneficiarios, payload.BeneficioBeneficiario);
+
+                if(await _repo.SaveChangesAsync())
+                {
                     return Ok("Dados Carregados");
-                // }
+                }
             }
             catch (Exception ex){
                 return StatusCode(500 , $"Erro: {ex.Message}");
             }
 
-            // return BadRequest();       
+            return BadRequest();      
         }
     }
 

@@ -13,7 +13,7 @@ namespace webAPI.Models
     {
         public List<BeneficiarioPayload>? Beneficiarios  { get; set; }
         public List<string>? Beneficios  { get; set; }
-        public Object? BeneficioBeneficiario  { get; set; }
+        public Dictionary<string, List<CpfQuantidade>>? BeneficioBeneficiario  { get; set; }
     }
 
     public partial class BeneficiarioPayload
@@ -23,5 +23,11 @@ namespace webAPI.Models
         public int? edv { get; set; }
         public string? cpf { get; set; }
         public string? unidade { get; set; }
+    }
+
+    public partial class CpfQuantidade
+    {
+        public string? cpf { get; set; }
+        public int? Quantidade { get; set; }
     }
 }
