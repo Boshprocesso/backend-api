@@ -238,9 +238,10 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
-        public async Task<dynamic> GetBeneficiosParaEntregar(string identificacao)
+        public async Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, string identificacao)
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
+            IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
             IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios.AsNoTracking();
             IQueryable<Beneficio> Beneficios = _context.Beneficios.AsNoTracking();
             IQueryable<Terceiro> Terceiros = _context.Terceiros.AsNoTracking();
@@ -283,9 +284,12 @@ namespace webAPI.DAO
             on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
             join beneficio in Beneficios
             on beneficiarioBeneficio.IdBeneficio equals beneficio.IdBeneficio
+            join eventoBeneficio in EventoBeneficios
+            on beneficio.IdBeneficio equals eventoBeneficio.IdBeneficio
             where beneficiarioBeneficio.Entregue == "0" && 
                 (beneficiarioBeneficio.IdBeneficiario == idBeneficiario
                     || beneficiarioBeneficio.IdTerceiro == idTerceiro)
+                && eventoBeneficio.IdEvento == idEvento
             select new {
                 Beneficio = beneficio.DescricaoBeneficio,
                 IdBeneficio = beneficio.IdBeneficio,
