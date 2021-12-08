@@ -5,8 +5,9 @@ namespace webAPI.DAO
 {
     public interface IRepository
     {
+        
         Task<bool> SaveChangesAsync();
-        Task<Beneficiario[]> GetAllBeneficiarios();
+        
 
         Task<Evento[]> GetAllEventos();
 
@@ -37,7 +38,9 @@ namespace webAPI.DAO
         Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio);
 
         Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId,Beneficio Descbeneficio);
-
         
+        
+        Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao);
+        void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
     }
 }

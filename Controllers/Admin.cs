@@ -16,7 +16,7 @@ namespace webAPI.Controllers
         public AdminController(IRepository repo){
             _repo = repo;
         }
-        [HttpGet]
+       /* [HttpGet]
         public async Task<IActionResult> GetBeneficiarios()
         {
             try{
@@ -27,8 +27,8 @@ namespace webAPI.Controllers
                 return BadRequest($"Erro: {ex.Message}");
             }
             
-        }
-        [HttpGet("/evento")]
+        }*/
+        [HttpGet("eventos")]
         public async Task<IActionResult> GetEvento()
         {
             try{
@@ -41,7 +41,7 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpGet("beneficioEvento/{EventoId}")]
+        [HttpGet("beneficiosEvento/{EventoId}")]
         public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
         {
             try{
@@ -84,7 +84,7 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpPut("EditarEvento")]
+        [HttpPut("EditarEvento/evento/{EventoId}")]
         public async Task<IActionResult> EditEvento(Guid EventoId, Evento novoEvento)
         {
             try{
@@ -100,7 +100,7 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpDelete("deleteBeneficioEvento/{EventoId}/{BeneficioId}")]
+        [HttpDelete("deleteBeneficioEvento/evento/{EventoId}/beneficio/{BeneficioId}")]
         public async Task<IActionResult> DeletarBeneficioFromEvento(Guid EventoId, Guid BeneficioId)
         {
             try{
@@ -117,7 +117,7 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpPost("adicionarBeneficioEvento")]
+        [HttpPost("adicionarBeneficioEvento/evento/{EvendoId}")]
         public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio) 
         {
             try{
@@ -134,7 +134,7 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpPut("EditarBeneficio")]
+        [HttpPut("EditarBeneficio/evento/{EventoId}/beneficio/{BeneficioId}")]
         public async Task<IActionResult> EditBeneficio(Guid EventoId, Guid BeneficioId,Beneficio Descbeneficio) 
         {
             try{

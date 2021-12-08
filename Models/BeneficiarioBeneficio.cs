@@ -5,8 +5,8 @@ namespace webAPI.Models
 {
     public partial class BeneficiarioBeneficio
     {
-        public Guid? IdBeneficiario { get; set; }
-        public Guid? IdBeneficio { get; set; }
+        public Guid IdBeneficiario { get; set; }
+        public Guid IdBeneficio { get; set; }
         public Guid? IdTerceiro { get; set; }
         public string? Entregue { get; set; }
         public int? Quantidade { get; set; }
