@@ -175,7 +175,8 @@ namespace webAPI.DAO
 
             modelBuilder.Entity<EventoBeneficio>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new {e.IdEvento, e.IdBeneficio})
+                    .HasName("PK__Evento__C8DC7BDAA64D1C18");
 
                 entity.ToTable("EventoBeneficio");
 
