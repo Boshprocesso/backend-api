@@ -24,6 +24,10 @@ namespace webAPI.DAO
 
         Task<dynamic> GetEvento(Evento evento);
 
+
+         Task<dynamic> GetLogin(Login login);
+         Task<dynamic> GetBeneficios(string cpf);
+
         Task inserirEvento(Evento evento);
 
         Task EditarEvento(Guid EventoId, Evento novoEvento);
@@ -34,6 +38,6 @@ namespace webAPI.DAO
 
         Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId,Beneficio Descbeneficio);
 
-        Task <dynamic> GetLogin(Login login);
+        
     }
 }
