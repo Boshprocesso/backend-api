@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
                       builder =>
                       {
                           builder.WithOrigins("http://localhost",
-                                              "https://www.localhost");
+                                              "https://localhost");
                       });
 });
 
