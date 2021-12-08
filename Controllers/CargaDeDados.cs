@@ -31,19 +31,18 @@ namespace webAPI.Controllers
             }
             
             try{
-                Guid idEvento = payload.IdEvento;
                 if(payload.Beneficiarios != null)
                 {
                     await _repo.carregarBeneficiarios(payload.Beneficiarios);
                 }
-                    
-                await _repo.carregarBeneficios(payload.Beneficios);
+
+                List<Beneficio> beneficios = await _repo.carregarBeneficios(payload.Beneficios);
 
                 List<Beneficiario> beneficiarios = (await _repo.GetAllBeneficiarios()).ToList();
 
-                /* List<Beneficio> beneficios = (await _repo.GetBeneficosFromEvento(payload.IdEvento)).ToList();
+                _repo.carregarEventoBeneficio(payload.IdEvento, beneficios);
                  
-                _repo.carregarRelacoes(beneficios, beneficiarios, payload.BeneficioBeneficiario, payload.IdEvento); */
+                _repo.carregarBeneficiarioBeneficio(beneficios, beneficiarios, payload.BeneficioBeneficiario);
 
                 if(await _repo.SaveChangesAsync())
                 {

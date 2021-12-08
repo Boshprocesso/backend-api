@@ -342,8 +342,9 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();
         }
 
-        public async Task carregarBeneficios(List<string> Beneficios)
+        public async Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios)
         {
+            List<Beneficio> listaBeneficios = new List<Beneficio>();
             
             foreach (var descricaoBeneficio in Beneficios)
             {
@@ -351,13 +352,16 @@ namespace webAPI.DAO
                     DescricaoBeneficio = descricaoBeneficio
                 };
                 
+                listaBeneficios.Add(beneficio);
                 _context.Beneficios.Add(beneficio);
             }
 
             await _context.SaveChangesAsync();
+
+            return listaBeneficios;
         }
 
-        public void carregarRelacoes(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario, Guid idEvento)
+        public void carregarEventoBeneficio(Guid idEvento, List<Beneficio> Beneficios)
         {
             foreach (Beneficio beneficio in Beneficios)
             {
@@ -368,6 +372,11 @@ namespace webAPI.DAO
 
                 _context.EventoBeneficios.Add(eventoBeneficio);
             }
+
+        }
+
+        public void carregarBeneficiarioBeneficio(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario)
+        {
 
             foreach (KeyValuePair<string, List<CpfQuantidade>> entrada in BeneficioBeneficiario)
             {

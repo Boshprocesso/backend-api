@@ -40,8 +40,10 @@ namespace webAPI.DAO
 
         Task carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
 
-        Task carregarBeneficios(List<string> Beneficios);
+        Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios);
 
-        void carregarRelacoes(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario, Guid idEvento);
+        void carregarEventoBeneficio(Guid idEvento, List<Beneficio> Beneficios);
+
+        void carregarBeneficiarioBeneficio(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
     }
 }
