@@ -11,6 +11,7 @@ namespace webAPI.Models
 
     public partial class Payload
     {
+        public Guid IdEvento  { get; set; }
         public List<BeneficiarioPayload>? Beneficiarios  { get; set; }
         public List<string>? Beneficios  { get; set; }
         public Dictionary<string, List<CpfQuantidade>>? BeneficioBeneficiario  { get; set; }
