@@ -31,20 +31,16 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
-        public async Task<dynamic> GetBeneficosFromEvento(Guid EventoId){
+        public async Task<Beneficio[]> GetBeneficosFromEvento(Guid EventoId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
             IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
 
-            var query = (
+            IQueryable<Beneficio> query = (
                 from b in benefconsultabb                
                 join eb in consultabb on b.IdBeneficio equals eb.IdBeneficio
                 where eb.IdEvento == EventoId
-                select new  {
-                    IdEvento = eb.IdEvento,
-                    IdBeneficio = b.IdBeneficio,
-                    descricaoBeneficio = b.DescricaoBeneficio
-                });
+                select b);
 
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);         
             return await query.ToArrayAsync();    
@@ -322,11 +318,13 @@ namespace webAPI.DAO
             }
         }
 
-        public async Task<List<Beneficiario>> carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios)
+        public async Task carregarBeneficiarios(List<BeneficiarioPayload> BeneficiariosParaInserir)
         {
-            List<Beneficiario> listaBeneficiarios = new List<Beneficiario>();
-            
-            foreach (var beneficiarioParaInserir in Beneficiarios)
+            List<Beneficiario> Beneficiarios = _context.Beneficiarios.AsNoTracking().ToList();
+
+            BeneficiariosParaInserir = BeneficiariosParaInserir.Where(bpi => !Beneficiarios.Any(b => b.Cpf == bpi.cpf)).ToList();
+
+            foreach (var beneficiarioParaInserir in BeneficiariosParaInserir)
             {
                 Beneficiario beneficiario = new Beneficiario {
                     NomeCompleto = beneficiarioParaInserir.nome,
@@ -338,18 +336,14 @@ namespace webAPI.DAO
                     ResponsavelInclusao = "Import Process"
                 };
                 
-                listaBeneficiarios.Add(beneficiario);
                 _context.Beneficiarios.Add(beneficiario);
             }
 
             await _context.SaveChangesAsync();
-
-            return listaBeneficiarios;
         }
 
-        public async Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios)
+        public async Task carregarBeneficios(List<string> Beneficios)
         {
-            List<Beneficio> listaBeneficios = new List<Beneficio>();
             
             foreach (var descricaoBeneficio in Beneficios)
             {
@@ -357,13 +351,10 @@ namespace webAPI.DAO
                     DescricaoBeneficio = descricaoBeneficio
                 };
                 
-                listaBeneficios.Add(beneficio);
                 _context.Beneficios.Add(beneficio);
             }
 
             await _context.SaveChangesAsync();
-
-            return listaBeneficios;
         }
 
         public void carregarRelacoes(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario, Guid idEvento)

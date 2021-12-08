@@ -10,7 +10,7 @@ namespace webAPI.DAO
 
         Task<Evento[]> GetAllEventos();
 
-        Task<dynamic> GetBeneficosFromEvento(Guid EventoId);
+        Task<Beneficio[]> GetBeneficosFromEvento(Guid EventoId);
 
         Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId);
 
@@ -38,9 +38,9 @@ namespace webAPI.DAO
         
         void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
 
-        Task<List<Beneficiario>> carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
+        Task carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
 
-        Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios);
+        Task carregarBeneficios(List<string> Beneficios);
 
         void carregarRelacoes(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario, Guid idEvento);
     }
