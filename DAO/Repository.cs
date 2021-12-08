@@ -324,7 +324,7 @@ namespace webAPI.DAO
 
         public async Task<List<Beneficiario>> carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios)
         {
-            List<Beneficiario> beneficiarios = new List<Beneficiario>();
+            List<Beneficiario> listaBeneficiarios = new List<Beneficiario>();
             
             foreach (var beneficiarioParaInserir in Beneficiarios)
             {
@@ -338,13 +338,32 @@ namespace webAPI.DAO
                     ResponsavelInclusao = "Import Process"
                 };
                 
-                beneficiarios.Add(beneficiario);
+                listaBeneficiarios.Add(beneficiario);
                 _context.Beneficiarios.Add(beneficiario);
             }
 
             await _context.SaveChangesAsync();
 
-            return beneficiarios;
+            return listaBeneficiarios;
+        }
+
+        public async Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios)
+        {
+            List<Beneficio> listaBeneficios = new List<Beneficio>();
+            
+            foreach (var descricaoBeneficio in Beneficios)
+            {
+                Beneficio beneficio = new Beneficio {
+                    DescricaoBeneficio = descricaoBeneficio
+                };
+                
+                listaBeneficios.Add(beneficio);
+                _context.Beneficios.Add(beneficio);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return listaBeneficios;
         }
     }
     

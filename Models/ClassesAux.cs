@@ -13,7 +13,7 @@ namespace webAPI.Models
     {
         public List<BeneficiarioPayload>? Beneficiarios  { get; set; }
         public List<string>? Beneficios  { get; set; }
-        public dynamic? BeneficioBeneficiario  { get; set; }
+        public Object? BeneficioBeneficiario  { get; set; }
     }
 
     public partial class BeneficiarioPayload

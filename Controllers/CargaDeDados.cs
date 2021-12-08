@@ -32,6 +32,7 @@ namespace webAPI.Controllers
             
             try{
                  List<Beneficiario> beneficiarios = await _repo.carregarBeneficiarios(payload.Beneficiarios);
+                 List<Beneficio> beneficios = await _repo.carregarBeneficios(payload.Beneficios);
 
                 /* if(await _repo.SaveChangesAsync())
                 { */
