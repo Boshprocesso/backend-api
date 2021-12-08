@@ -342,11 +342,23 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios)
+        public async Task<List<Beneficio>> carregarBeneficios(Guid idEvento, List<string> BeneficiosParaInserir)
         {
+            IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<Beneficio> beneficios = _context.Beneficios.AsNoTracking();
             List<Beneficio> listaBeneficios = new List<Beneficio>();
+
+            List<Beneficio> beneficiosDoEvento = (
+                from beneficio in beneficios
+                join EventoBeneficio in EventoBeneficios
+                on beneficio.IdBeneficio equals EventoBeneficio.IdBeneficio
+                where EventoBeneficio.IdEvento == idEvento
+                select beneficio
+            ).ToList();
             
-            foreach (var descricaoBeneficio in Beneficios)
+            BeneficiosParaInserir = BeneficiosParaInserir.Where(bpi => !beneficiosDoEvento.Any(b => b.DescricaoBeneficio == bpi)).ToList();
+            
+            foreach (var descricaoBeneficio in BeneficiosParaInserir)
             {
                 Beneficio beneficio = new Beneficio {
                     DescricaoBeneficio = descricaoBeneficio
@@ -380,19 +392,21 @@ namespace webAPI.DAO
 
             foreach (KeyValuePair<string, List<CpfQuantidade>> entrada in BeneficioBeneficiario)
             {
-                Beneficio beneficio = Beneficios.Where(b => b.DescricaoBeneficio == entrada.Key).First();
+                Beneficio? beneficio = Beneficios.Where(b => b.DescricaoBeneficio == entrada.Key).FirstOrDefault();
 
-                foreach (CpfQuantidade cpfQuantidade in entrada.Value)
-                {
-                    Beneficiario beneficiario = Beneficiarios.Where(b => b.Cpf == cpfQuantidade.cpf).First();
+                if(beneficio != null) {
+                    foreach (CpfQuantidade cpfQuantidade in entrada.Value)
+                    {
+                        Beneficiario beneficiario = Beneficiarios.Where(b => b.Cpf == cpfQuantidade.cpf).First();
 
-                    BeneficiarioBeneficio beneficiarioBeneficio = new BeneficiarioBeneficio {
-                        IdBeneficiario = beneficiario.IdBeneficiario,
-                        IdBeneficio = beneficio.IdBeneficio,
-                        Quantidade = cpfQuantidade.Quantidade
-                    };
+                        BeneficiarioBeneficio beneficiarioBeneficio = new BeneficiarioBeneficio {
+                            IdBeneficiario = beneficiario.IdBeneficiario,
+                            IdBeneficio = beneficio.IdBeneficio,
+                            Quantidade = cpfQuantidade.Quantidade
+                        };
 
-                    _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                        _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                    }
                 }
             }
         }

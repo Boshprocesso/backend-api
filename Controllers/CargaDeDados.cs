@@ -31,12 +31,13 @@ namespace webAPI.Controllers
             }
             
             try{
+                Guid idEvento = payload.IdEvento;
                 if(payload.Beneficiarios != null)
                 {
                     await _repo.carregarBeneficiarios(payload.Beneficiarios);
                 }
 
-                List<Beneficio> beneficios = await _repo.carregarBeneficios(payload.Beneficios);
+                List<Beneficio> beneficios = await _repo.carregarBeneficios(idEvento, payload.Beneficios);
 
                 List<Beneficiario> beneficiarios = (await _repo.GetAllBeneficiarios()).ToList();
 

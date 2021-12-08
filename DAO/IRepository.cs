@@ -40,7 +40,7 @@ namespace webAPI.DAO
 
         Task carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
 
-        Task<List<Beneficio>> carregarBeneficios(List<string> Beneficios);
+        Task<List<Beneficio>> carregarBeneficios(Guid idEvento, List<string> Beneficios);
 
         void carregarEventoBeneficio(Guid idEvento, List<Beneficio> Beneficios);
 
