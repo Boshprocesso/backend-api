@@ -18,11 +18,11 @@ namespace webAPI.Controllers
             _repo = repo;
         }
 
-        [HttpGet("/{codBeneficiario}")]
-        public async Task <IActionResult> GetBeneficios(string codBeneficiario)
+        [HttpGet("{id}")]
+        public async Task <IActionResult> GetBeneficios(Guid id)
         {
             try{
-                var result = await _repo.GetBeneficios(codBeneficiario);
+                var result = await _repo.GetBeneficios(id);
                 if(result != null)
                 {
                     return Ok(result);
