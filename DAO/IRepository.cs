@@ -11,6 +11,8 @@ namespace webAPI.DAO
 
         Task<Evento[]> GetAllEventos();
 
+        Task<EventoBeneficiario[]> GetAllEventoBeneficiarios();
+
         Task<dynamic> GetBeneficiosFromEvento(Guid EventoId);
 
         Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId);

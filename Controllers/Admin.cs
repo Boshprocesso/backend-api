@@ -16,18 +16,18 @@ namespace webAPI.Controllers
         public AdminController(IRepository repo){
             _repo = repo;
         }
-       /* [HttpGet]
-        public async Task<IActionResult> GetBeneficiarios()
+        [HttpGet("BeneficiarioEventos")]
+        public async Task<IActionResult> GetEventBeneficiarios()
         {
             try{
-                var result = await _repo.GetAllBeneficiarios();
+                var result = await _repo.GetAllEventoBeneficiarios();
                 return Ok(result);
             }
             catch (Exception ex){
                 return BadRequest($"Erro: {ex.Message}");
             }
             
-        }*/
+        }
         [HttpGet("eventos")]
         public async Task<IActionResult> GetEvento()
         {
