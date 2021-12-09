@@ -349,6 +349,7 @@ namespace webAPI.DAO
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
             IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<EventoBeneficiario> EventoBeneficiarios = _context.EventoBeneficiarios.AsNoTracking();
             IQueryable<IlhaBeneficio> ilhaBeneficios = _context.IlhaBeneficios.AsNoTracking();
             IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios.AsNoTracking();
             IQueryable<Beneficio> Beneficios = _context.Beneficios.AsNoTracking();
@@ -412,6 +413,15 @@ namespace webAPI.DAO
             /* join eventoBeneficio in EventoBeneficios
             on beneficio.IdBeneficio equals eventoBeneficio.IdBeneficio */
                 // && eventoBeneficio.IdEvento == idEvento
+
+            query = query.Where(result => 
+                EventoBeneficiarios.Any(eb => eb.IdEvento == idEvento && eb.IdBeneficiario == result.IdBeneficiario));
+            
+            query = query.Where(result => 
+                EventoBeneficios.Any(eb => eb.IdEvento == idEvento && eb.IdBeneficio == result.IdBeneficio));
+            
+            query = query.Where(result => 
+                ilhaBeneficios.Any(eb => eb.IdIlha == idIlha && eb.IdBeneficio == result.IdBeneficio));
 
             return await query.ToArrayAsync();
         }
