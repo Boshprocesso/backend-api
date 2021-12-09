@@ -433,46 +433,69 @@ namespace webAPI.DAO
             }
         }
 
-        public async Task<List<Beneficiario>> carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> BeneficiariosParaInserir)
+        public async Task carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> BeneficiariosParaInserir)
         {
-            List<Beneficiario> beneficiarios = _context.Beneficiarios.AsNoTracking().ToList();
+            IQueryable<EventoBeneficiario> eventoBeneficiarios = _context.EventoBeneficiarios.AsNoTracking();
+            IQueryable<Beneficiario> beneficiarios = _context.Beneficiarios.AsNoTracking();
 
-            BeneficiariosParaInserir = BeneficiariosParaInserir.Where(bpi => !beneficiarios.Any(b => b.Cpf == bpi.cpf)).ToList();
-
-            foreach (var beneficiarioParaInserir in BeneficiariosParaInserir)
+            List<Beneficiario> beneficiariosDoEvento = (
+                from beneficiario in beneficiarios
+                join eventoBeneficiario in eventoBeneficiarios
+                on beneficiario.IdBeneficiario equals eventoBeneficiario.IdBeneficiario
+                where eventoBeneficiario.IdEvento == idEvento
+                select beneficiario
+            ).ToList();
+            
+            BeneficiariosParaInserir = BeneficiariosParaInserir.Where(bpi => !beneficiariosDoEvento.Any(b => b.Cpf == bpi.cpf)).ToList();
+            
+            List<Beneficiario> beneficiariosRelacao = new List<Beneficiario>();
+            foreach (var novoBeneficiario in BeneficiariosParaInserir)
             {
                 Beneficiario beneficiario = new Beneficiario {
-                    NomeCompleto = beneficiarioParaInserir.nome,
-                    DataNascimento = beneficiarioParaInserir.nascimento,
-                    Edv = beneficiarioParaInserir.edv,
-                    Cpf = beneficiarioParaInserir.cpf,
-                    Unidade = beneficiarioParaInserir.unidade,
+                    NomeCompleto = novoBeneficiario.nome,
+                    Cpf = novoBeneficiario.cpf,
+                    Edv = novoBeneficiario.edv,
+                    Unidade = novoBeneficiario.unidade,
+                    DataNascimento = novoBeneficiario.nascimento,
                     DataInclusao = DateTime.Now,
                     ResponsavelInclusao = "Import Process"
                 };
 
-                var local = _context.Beneficiarios.Local
-                    .FirstOrDefault(beneficiarioLocal => beneficiarioLocal.Cpf == beneficiario.Cpf);
+                var beneficiarioNaTabela = beneficiarios
+                    .Where(beneficiarioNaTabela => beneficiarioNaTabela.Cpf == beneficiario.Cpf).FirstOrDefault();
 
-                if(local == null)
+                if(beneficiarioNaTabela == null)
                 {
+                    beneficiariosRelacao.Add(beneficiario);
                     _context.Beneficiarios.Add(beneficiario);
+                }else {
+                    beneficiariosRelacao.Add(beneficiarioNaTabela);
                 }
             }
 
             await _context.SaveChangesAsync();
 
-            return beneficiarios;
+            foreach (Beneficiario beneficiario in beneficiariosRelacao)
+            {
+                EventoBeneficiario eventoBeneficiario = new EventoBeneficiario {
+                    IdEvento = idEvento,
+                    IdBeneficiario = beneficiario.IdBeneficiario
+                };
+
+                _context.EventoBeneficiarios.Add(eventoBeneficiario);
+            }
+            
+            await _context.SaveChangesAsync();
         }
 
         public async Task carregarBeneficios(Guid idEvento, List<string> BeneficiosParaInserir)
         {
-            IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<EventoBeneficio> eventoBeneficios = _context.EventoBeneficios.AsNoTracking();
             IQueryable<Beneficio> beneficios = _context.Beneficios.AsNoTracking();
 
             List<Beneficio> beneficiosDoEvento = (
                 from beneficio in beneficios
-                join EventoBeneficio in EventoBeneficios
+                join EventoBeneficio in eventoBeneficios
                 on beneficio.IdBeneficio equals EventoBeneficio.IdBeneficio
                 where EventoBeneficio.IdEvento == idEvento
                 select beneficio
@@ -487,7 +510,8 @@ namespace webAPI.DAO
                     DescricaoBeneficio = descricaoBeneficio
                 };
 
-                var beneficioNaTabela = beneficios.Where(beneficioNaTabela => beneficioNaTabela.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
+                var beneficioNaTabela = beneficios
+                    .Where(beneficioNaTabela => beneficioNaTabela.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
 
                 if(beneficioNaTabela == null)
                 {
@@ -506,8 +530,6 @@ namespace webAPI.DAO
                     IdEvento = idEvento,
                     IdBeneficio = beneficio.IdBeneficio
                 };
-
-                Console.WriteLine(eventoBeneficio.IdBeneficio);
 
                 _context.EventoBeneficios.Add(eventoBeneficio);
             }

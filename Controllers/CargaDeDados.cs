@@ -33,22 +33,17 @@ namespace webAPI.Controllers
             try{
                 Guid idEvento = payload.IdEvento;
                 
-                List<Beneficiario> beneficiarios = await _repo.carregarBeneficiarios(idEvento, payload.Beneficiarios);
-
                 await _repo.carregarBeneficios(idEvento, payload.Beneficios);
+                
+                await _repo.carregarBeneficiarios(idEvento, payload.Beneficiarios);
                  
                 // _repo.carregarBeneficiarioBeneficio(idEvento, payload.BeneficioBeneficiario);
 
-                if(await _repo.SaveChangesAsync())
-                {
-                    return Ok("Dados Carregados");
-                }
+                return Ok("Dados Carregados");
             }
             catch (Exception ex){
                 return StatusCode(500 , $"Erro: {ex.Message}");
             }
-
-            return BadRequest();      
         }
     }
 
