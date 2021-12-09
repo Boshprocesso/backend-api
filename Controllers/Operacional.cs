@@ -16,8 +16,8 @@ namespace webAPI.Controllers
         public OperacionalController(IRepository repo){
             _repo = repo;
         }
-        [HttpGet("{idEvento}")]
-        public async Task<IActionResult> GetBeneficiosParaEntregar(Guid idEvento, [FromQuery(Name="identificacao")] string? identificacao)
+        [HttpGet("{idEvento}/{idIlha}")]
+        public async Task<IActionResult> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, [FromQuery(Name="identificacao")] string? identificacao)
         {
             if(identificacao == null)
             {
@@ -25,7 +25,7 @@ namespace webAPI.Controllers
             }
 
             try{
-                var result = await _repo.GetBeneficiosParaEntregar(idEvento, identificacao);
+                var result = await _repo.GetBeneficiosParaEntregar(idEvento, idIlha, identificacao);
                 return Ok(result);
             }
             catch (Exception ex){

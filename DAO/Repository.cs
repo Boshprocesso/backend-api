@@ -345,25 +345,28 @@ namespace webAPI.DAO
             return await resposta.ToListAsync();
         }
 
-        public async Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, string identificacao)
+        public async Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao)
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
             IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<IlhaBeneficio> ilhaBeneficios = _context.IlhaBeneficios.AsNoTracking();
             IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios.AsNoTracking();
             IQueryable<Beneficio> Beneficios = _context.Beneficios.AsNoTracking();
             IQueryable<Terceiro> Terceiros = _context.Terceiros.AsNoTracking();
             Guid idTerceiro, idBeneficiario;
             
             try {
-                if(identificacao.Length < 14) {
+                if(identificacao.Length != 11) {
                     idBeneficiario = 
                     (from beneficiario in Beneficiarios
                     where beneficiario.Edv == Convert.ToInt32(identificacao)
                     select beneficiario.IdBeneficiario).First();
                 }else {
+                    string buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+
                     idBeneficiario = 
                         (from beneficiario in Beneficiarios
-                        where beneficiario.Cpf == identificacao
+                        where beneficiario.Cpf == buscarIdentificacao
                         select beneficiario.IdBeneficiario).First();
                 }
             } catch {
@@ -371,15 +374,20 @@ namespace webAPI.DAO
             }
             
             try {
-                if(identificacao.Length < 14) {
-                    identificacao = 
+                string buscarIdentificacao;
+
+                if(identificacao.Length != 11) {
+                    buscarIdentificacao = 
                     (from beneficiario in Beneficiarios
                     where beneficiario.Edv == Convert.ToInt32(identificacao)
                     select beneficiario.Cpf).First();
+                } else {
+                    buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
                 }
+
                 idTerceiro = 
                     (from terceiro in Terceiros
-                    where terceiro.Identificacao == identificacao
+                    where terceiro.Identificacao == buscarIdentificacao
                     select terceiro.IdTerceiro).First();
             } catch {
                 idTerceiro = Guid.Empty;
@@ -391,20 +399,19 @@ namespace webAPI.DAO
             on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
             join beneficio in Beneficios
             on beneficiarioBeneficio.IdBeneficio equals beneficio.IdBeneficio
-            join eventoBeneficio in EventoBeneficios
-            on beneficio.IdBeneficio equals eventoBeneficio.IdBeneficio
             where beneficiarioBeneficio.Entregue == "0" && 
                 (beneficiarioBeneficio.IdBeneficiario == idBeneficiario
                     || beneficiarioBeneficio.IdTerceiro == idTerceiro)
-                && eventoBeneficio.IdEvento == idEvento
             select new {
                 Beneficio = beneficio.DescricaoBeneficio,
                 IdBeneficio = beneficio.IdBeneficio,
                 Quantidade = beneficiarioBeneficio.Quantidade,
                 IdBeneficiario = beneficiario.IdBeneficiario,
                 Beneficiario = beneficiario.NomeCompleto
-
             };
+            /* join eventoBeneficio in EventoBeneficios
+            on beneficio.IdBeneficio equals eventoBeneficio.IdBeneficio */
+                // && eventoBeneficio.IdEvento == idEvento
 
             return await query.ToArrayAsync();
         }

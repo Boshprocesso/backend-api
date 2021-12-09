@@ -40,7 +40,7 @@ namespace webAPI.DAO
 
         Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio);
 
-        Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, string identificacao);
+        Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao);
         
         void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
 
