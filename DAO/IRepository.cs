@@ -10,6 +10,7 @@ namespace webAPI.DAO
         Task<Beneficiario[]> GetAllBeneficiarios();
 
         Task<Evento[]> GetAllEventos();
+        Task<dynamic> GetBeneficiosFromEvento(Guid EventoId);
 
         Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId);
 
@@ -23,8 +24,8 @@ namespace webAPI.DAO
 
         Task<dynamic> GetEvento(Evento evento);
 
-
          Task<dynamic> GetLogin(Login login);
+
          Task<dynamic> GetBeneficios(string cpf);
 
         Task inserirEvento(Evento evento);
@@ -35,16 +36,16 @@ namespace webAPI.DAO
 
         Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio);
 
+        Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio);
+
         Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, string identificacao);
         
         void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
 
-        Task carregarBeneficiarios(List<BeneficiarioPayload> Beneficiarios);
+        Task<List<Beneficiario>> carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> Beneficiarios);
 
-        Task<List<Beneficio>> carregarBeneficios(Guid idEvento, List<string> Beneficios);
+        Task carregarBeneficios(Guid idEvento, List<string> Beneficios);
 
-        void carregarEventoBeneficio(Guid idEvento, List<Beneficio> Beneficios);
-
-        void carregarBeneficiarioBeneficio(List<Beneficio> Beneficios, List<Beneficiario> Beneficiarios, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
+        void carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
     }
 }

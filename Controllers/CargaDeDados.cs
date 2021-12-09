@@ -25,25 +25,19 @@ namespace webAPI.Controllers
                 return StatusCode(400, "Informe o payload de dados");
             }
 
-            if(payload.Beneficios == null || payload.BeneficioBeneficiario == null)
+            if(payload.Beneficiarios == null || payload.Beneficios == null || payload.BeneficioBeneficiario == null)
             {
                 return StatusCode(400, "Está faltando uma ou mais informações no payload");
             }
             
             try{
                 Guid idEvento = payload.IdEvento;
-                if(payload.Beneficiarios != null)
-                {
-                    await _repo.carregarBeneficiarios(payload.Beneficiarios);
-                }
+                
+                List<Beneficiario> beneficiarios = await _repo.carregarBeneficiarios(idEvento, payload.Beneficiarios);
 
-                List<Beneficio> beneficios = await _repo.carregarBeneficios(idEvento, payload.Beneficios);
-
-                List<Beneficiario> beneficiarios = (await _repo.GetAllBeneficiarios()).ToList();
-
-                _repo.carregarEventoBeneficio(payload.IdEvento, beneficios);
+                await _repo.carregarBeneficios(idEvento, payload.Beneficios);
                  
-                _repo.carregarBeneficiarioBeneficio(beneficios, beneficiarios, payload.BeneficioBeneficiario);
+                // _repo.carregarBeneficiarioBeneficio(idEvento, payload.BeneficioBeneficiario);
 
                 if(await _repo.SaveChangesAsync())
                 {
