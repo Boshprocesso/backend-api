@@ -9,11 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
+    options.AddDefaultPolicy(
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost",
-                                              "https://localhost");
+                          builder.AllowAnyOrigin()
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod();
                       });
 });
 
@@ -22,13 +23,11 @@ builder.Services.AddDbContext<BOSHBENEFICIOContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("conexaobd"));
 
-
 });
 builder.Services.AddScoped<IRepository,Repository>();
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.WebHost.UseIISIntegration();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -61,10 +60,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseCors(MyAllowSpecificOrigins);
-
-app.UseAuthorization();
+//app.UseHttpsRedirection();
+app.UseCors();
 
 app.MapControllers();
 

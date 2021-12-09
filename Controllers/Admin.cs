@@ -117,7 +117,7 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpPost("adicionarBeneficioEvento/evento/{EvendoId}")]
+        [HttpPost("adicionarBeneficioEvento/evento/{EventoId}")]
         public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio) 
         {
             try{
