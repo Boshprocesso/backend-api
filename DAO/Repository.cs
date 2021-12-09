@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,13 @@ namespace webAPI.DAO
         public async Task<Evento[]> GetAllEventos()
         {
             IQueryable<Evento> query = _context.Eventos;
+            query = query.AsNoTracking().OrderBy(c => c.IdEvento);
+            return await query.ToArrayAsync();
+        }
+
+        public async Task<EventoBeneficiario[]> GetAllEventoBeneficiarios()
+        {
+            IQueryable<EventoBeneficiario> query = _context.EventoBeneficiarios;
             query = query.AsNoTracking().OrderBy(c => c.IdEvento);
             return await query.ToArrayAsync();
         }
@@ -217,59 +225,124 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();         
         }
 
-
-
-
         public async Task<dynamic> GetLogin(Login login)
-        {
+        {   
+            IQueryable<DateTime?>? data;
+            String[]? nascimentoLogin;
             IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
-            var data = (from Beneficiario in consultabb 
-                        where Beneficiario.Cpf == login.cod 
-                        select Beneficiario.DataNascimento);
-            var nascimentoLogin = login.nascimento.Split('-');
-            Array.Reverse(nascimentoLogin);
-            if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
-            var query = (from beneficiario in consultabb
-                        where beneficiario.Cpf == login.cod
-                        select new 
-                        {
-                            codFuncionario = beneficiario.Cpf,
-                            nomeFuncionario = beneficiario.NomeCompleto,
-                            nascimento = beneficiario.DataNascimento,
-                            administrativo = true,
-                            entregaproduto = true
-                        });
-                return await query.ToArrayAsync();
+            if(login.cod.Length == 14)
+            { 
+                data = (from Beneficiario in consultabb.AsNoTracking()
+                            where Beneficiario.Cpf == login.cod 
+                            select Beneficiario.DataNascimento);
+                nascimentoLogin = login.nascimento.Split('-');
+                Array.Reverse(nascimentoLogin);
+                if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
+                var query = (from beneficiario in consultabb.AsNoTracking()
+                            where beneficiario.Cpf == login.cod
+                            select new 
+                            {
+                                codFuncionario = beneficiario.IdBeneficiario,
+                                nomeFuncionario = beneficiario.NomeCompleto,
+                                nascimento = beneficiario.DataNascimento,
+                                administrativo = true,
+                                entregaproduto = true
+                            });
+                    return await query.ToArrayAsync();
+                }
+                return null;
             }
-            return null;
+                data = (from Beneficiario in consultabb 
+                            where Beneficiario.Edv == Convert.ToInt32(login.cod) 
+                            select Beneficiario.DataNascimento);
+                nascimentoLogin = login.nascimento.Split('-');
+                Array.Reverse(nascimentoLogin);
+                if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
+                var query = (from beneficiario in consultabb.AsNoTracking()
+                            where beneficiario.Edv == Convert.ToInt32(login.cod)
+                            select new 
+                            {
+                                codFuncionario = beneficiario.IdBeneficiario,
+                                nomeFuncionario = beneficiario.NomeCompleto,
+                                nascimento = beneficiario.DataNascimento,
+                                administrativo = true,
+                                entregaproduto = true
+                            });
+                var resposta = from beneficiario in consultabb.AsNoTracking()
+                            where beneficiario.Edv == Convert.ToInt32(login.cod)
+                            select new {
+                                login = query.ToArray()
+                            };
+                    return await resposta.ToArrayAsync();
+                }
+                return null;
+            
         }
 
-        public async Task<dynamic> GetBeneficios(string cod)
+        public async Task<dynamic> GetBeneficios(Guid cod)
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
             IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios;
             IQueryable<Beneficio> Beneficios = _context.Beneficios;
-            var id = (from beneficiario in Beneficiarios
-                    where beneficiario.Cpf == cod
-                    select beneficiario.IdBeneficiario);
-            var queryBeneficios = (from bb in BeneficiarioBeneficios
-                        join b in Beneficios on bb.IdBeneficio equals b.IdBeneficio
-                        where bb.IdBeneficiario == id.FirstOrDefault()
-                        select new{
+            IQueryable<Terceiro> Terceiros = _context.Terceiros;
+
+
+            var consultaBeneficios = (from bb in BeneficiarioBeneficios.AsNoTracking()
+                        join b in Beneficios.AsNoTracking() on bb.IdBeneficio equals b.IdBeneficio
+                        where bb.IdBeneficiario == cod
+                        select new
+                        {
                             idProduto = b.IdBeneficio,
                             beneficio = b.DescricaoBeneficio,
                             status = bb.Entregue,
                             quantidade = bb.Quantidade
                         });
-            var query = from beneficiario in Beneficiarios
-                        where beneficiario.IdBeneficiario == id.FirstOrDefault()
-                        select new{
+
+            var respostaBeneficiario = from beneficiario in Beneficiarios.AsNoTracking()
+                        where beneficiario.IdBeneficiario == cod
+                        select new
+                        {
                             codFuncionario = cod,
                             nomeFuncionario = beneficiario.NomeCompleto,
-                            beneficios = queryBeneficios.ToArray()
+                            beneficios = consultaBeneficios.ToArray()
                         };
+            
+            List<dynamic> respostaTerceiro = new List<dynamic>();
 
-            return await query.ToArrayAsync();
+            var listaTerceiros = (from bb in BeneficiarioBeneficios where bb.IdTerceiro == cod select bb).GroupBy(s => s.IdBeneficiario).Select(s => s.First()).ToArray().Select(s => s.IdBeneficiario).ToArray();
+            
+            foreach(Guid elem in listaTerceiros)
+            {    
+                var consultaTerceiro = (from bb in BeneficiarioBeneficios.AsNoTracking()
+                                        join b in Beneficios.AsNoTracking() on bb.IdBeneficio equals b.IdBeneficio
+                                        where bb.IdBeneficiario == elem
+                                        select new
+                                        {
+                                            idProduto = b.IdBeneficio,
+                                            beneficio = b.DescricaoBeneficio,
+                                            status = bb.Entregue,
+                                            quantidade = bb.Quantidade
+                                        });
+                var terceiro = (from b in Beneficiarios.AsNoTracking()
+                                where b.IdBeneficiario == elem
+                                select new
+                                {
+                                    codFuncionario = elem,
+                                    nomeFuncionario = b.NomeCompleto,
+                                    beneficios = consultaTerceiro.ToList()
+                                });
+                respostaTerceiro.AddRange(terceiro.ToList());
+            };
+            
+            var resposta =  from beneficiario in Beneficiarios.AsNoTracking()
+                            where beneficiario.IdBeneficiario == cod
+                            select new
+                            {
+                                beneficios = respostaBeneficiario.ToArray(),
+                                terceiros = respostaTerceiro
+                             };
+
+            return await resposta.ToListAsync();
         }
 
         public async Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, string identificacao)
