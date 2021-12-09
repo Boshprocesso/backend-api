@@ -48,6 +48,6 @@ namespace webAPI.DAO
 
         Task carregarBeneficios(Guid idEvento, List<string> Beneficios);
 
-        void carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
+        Task carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
     }
 }

@@ -537,17 +537,17 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();
         }
 
-        public void carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario)
+        public async Task carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario)
         {
-            /* List<Beneficiario> beneficiariosDoEvento = (
+            IQueryable<BeneficiarioBeneficio> beneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
+
+            List<Beneficiario> beneficiariosDoEvento = (
                 from beneficiario in _context.Beneficiarios.AsNoTracking()
-                join EventoBeneficiario in _context.EventoBeneficiarios.AsNoTracking()
-                on beneficiario.IdBeneficiario equals EventoBeneficiario.IdBeneficiario
-                where EventoBeneficiario.IdEvento == idEvento
+                join eventoBeneficiario in _context.EventoBeneficiarios.AsNoTracking()
+                on beneficiario.IdBeneficiario equals eventoBeneficiario.IdBeneficiario
+                where eventoBeneficiario.IdEvento == idEvento
                 select beneficiario
-            ).ToList(); */
-            
-            List<Beneficiario> beneficiariosDoEvento = _context.Beneficiarios.AsNoTracking().ToList();
+            ).ToList();
 
             List<Beneficio> beneficiosDoEvento = (
                 from beneficio in _context.Beneficios.AsNoTracking()
@@ -576,10 +576,19 @@ namespace webAPI.DAO
                             .FirstOrDefault(beneficiarioBeneficioLocal => beneficiarioBeneficioLocal.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
                                 && beneficiarioBeneficioLocal.IdBeneficio == beneficiarioBeneficio.IdBeneficio);
 
-                        _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                        var beneficiarioBeneficioNaTabela = beneficiarioBeneficios
+                            .Where(beneficiarioBeneficioNaTabela => beneficiarioBeneficioNaTabela.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
+                                && beneficiarioBeneficioNaTabela.IdBeneficio == beneficiarioBeneficio.IdBeneficio).FirstOrDefault();
+
+                        if(beneficiarioBeneficioNaTabela == null && local == null)
+                        {
+                            _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                        }
                     }
                 }
             }
+            
+            await _context.SaveChangesAsync();
         }
     }
     

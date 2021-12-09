@@ -34,10 +34,10 @@ namespace webAPI.Controllers
                 Guid idEvento = payload.IdEvento;
                 
                 await _repo.carregarBeneficios(idEvento, payload.Beneficios);
-                
+
                 await _repo.carregarBeneficiarios(idEvento, payload.Beneficiarios);
                  
-                // _repo.carregarBeneficiarioBeneficio(idEvento, payload.BeneficioBeneficiario);
+                await _repo.carregarBeneficiarioBeneficio(idEvento, payload.BeneficioBeneficiario);
 
                 return Ok("Dados Carregados");
             }
