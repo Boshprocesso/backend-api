@@ -193,13 +193,13 @@ namespace webAPI.DAO
             IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
             if(login.cod.Length == 14)
             { 
-                data = (from Beneficiario in consultabb 
+                data = (from Beneficiario in consultabb.AsNoTracking()
                             where Beneficiario.Cpf == login.cod 
                             select Beneficiario.DataNascimento);
                 nascimentoLogin = login.nascimento.Split('-');
                 Array.Reverse(nascimentoLogin);
                 if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
-                var query = (from beneficiario in consultabb
+                var query = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Cpf == login.cod
                             select new 
                             {
@@ -219,7 +219,7 @@ namespace webAPI.DAO
                 nascimentoLogin = login.nascimento.Split('-');
                 Array.Reverse(nascimentoLogin);
                 if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
-                var query = (from beneficiario in consultabb
+                var query = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Edv == Convert.ToInt32(login.cod)
                             select new 
                             {
@@ -229,7 +229,7 @@ namespace webAPI.DAO
                                 administrativo = true,
                                 entregaproduto = true
                             });
-                var resposta = from beneficiario in consultabb
+                var resposta = from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Edv == Convert.ToInt32(login.cod)
                             select new {
                                 login = query.ToArray()
@@ -246,8 +246,8 @@ namespace webAPI.DAO
             IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios;
             IQueryable<Beneficio> Beneficios = _context.Beneficios;
             IQueryable<Terceiro> Terceiros = _context.Terceiros;
-            var consultaBeneficios = (from bb in BeneficiarioBeneficios
-                        join b in Beneficios on bb.IdBeneficio equals b.IdBeneficio
+            var consultaBeneficios = (from bb in BeneficiarioBeneficios.AsNoTracking()
+                        join b in Beneficios.AsNoTracking() on bb.IdBeneficio equals b.IdBeneficio
                         where bb.IdBeneficiario == cod
                         select new
                         {
@@ -257,7 +257,7 @@ namespace webAPI.DAO
                             quantidade = bb.Quantidade
                         });
 
-            var respostaBeneficiario = from beneficiario in Beneficiarios
+            var respostaBeneficiario = from beneficiario in Beneficiarios.AsNoTracking()
                         where beneficiario.IdBeneficiario == cod
                         select new
                         {
@@ -272,8 +272,8 @@ namespace webAPI.DAO
             
             foreach(Guid elem in listaTerceiros)
             {    
-                var consultaTerceiro = (from bb in BeneficiarioBeneficios
-                                        join b in Beneficios on bb.IdBeneficio equals b.IdBeneficio
+                var consultaTerceiro = (from bb in BeneficiarioBeneficios.AsNoTracking()
+                                        join b in Beneficios.AsNoTracking() on bb.IdBeneficio equals b.IdBeneficio
                                         where bb.IdBeneficiario == elem
                                         select new
                                         {
@@ -282,18 +282,18 @@ namespace webAPI.DAO
                                             status = bb.Entregue,
                                             quantidade = bb.Quantidade
                                         });
-                var terceiro = (from b in Beneficiarios
-                                        where b.IdBeneficiario == elem
-                                        select new
-                                        {
-                                            codFuncionario = elem,
-                                            nomeFuncionario = b.NomeCompleto,
-                                            beneficios = consultaTerceiro.ToList()
-                                        });
+                var terceiro = (from b in Beneficiarios.AsNoTracking()
+                                where b.IdBeneficiario == elem
+                                select new
+                                {
+                                    codFuncionario = elem,
+                                    nomeFuncionario = b.NomeCompleto,
+                                    beneficios = consultaTerceiro.ToList()
+                                });
                 respostaTerceiro.AddRange(terceiro.ToList());
             };
 
-            var resposta =  from beneficiario in Beneficiarios
+            var resposta =  from beneficiario in Beneficiarios.AsNoTracking()
                             where beneficiario.IdBeneficiario == cod
                             select new
                             {
