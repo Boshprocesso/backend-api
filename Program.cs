@@ -3,9 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using webAPI.DAO;
 using Microsoft.Extensions.DependencyInjection;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+                      builder =>
+                      {
+                          builder.AllowAnyOrigin()
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod();
+                      });
+});
 
 string  connString = builder.Configuration.GetConnectionString("conexaobd");
 builder.Services.AddDbContext<BOSHBENEFICIOContext>(options =>
@@ -49,6 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors();
 
 app.UseHttpsRedirection();
 
