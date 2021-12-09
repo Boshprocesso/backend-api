@@ -25,6 +25,7 @@ namespace webAPI.DAO
         public virtual DbSet<Ilha> Ilhas { get; set; } = null!;
         public virtual DbSet<IlhaBeneficio> IlhaBeneficios { get; set; } = null!;
         public virtual DbSet<Terceiro> Terceiros { get; set; } = null!;
+        public virtual DbSet<EventoBeneficiario> EventoBeneficiarios { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -171,6 +172,29 @@ namespace webAPI.DAO
                     .HasMaxLength(30)
                     .IsUnicode(false)
                     .HasColumnName("nomeEvento");
+            });
+
+            modelBuilder.Entity<EventoBeneficiario>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("EventoBeneficiario");
+
+                entity.Property(e => e.IdBeneficiario).HasColumnName("idBeneficiario");
+
+                entity.Property(e => e.IdEvento).HasColumnName("idEvento");
+
+                entity.HasOne(d => d.IdBeneficiarioNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdBeneficiario)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EventoBeneficiario_Beneficiario");
+
+                entity.HasOne(d => d.IdEventoNavigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdEvento)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_EventoBeneficiario_Evento");
             });
 
             modelBuilder.Entity<EventoBeneficio>(entity =>

@@ -26,6 +26,13 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
+        public async Task<EventoBeneficiario[]> GetAllEventoBeneficiarios()
+        {
+            IQueryable<EventoBeneficiario> query = _context.EventoBeneficiarios;
+            query = query.AsNoTracking().OrderBy(c => c.IdEvento);
+            return await query.ToArrayAsync();
+        }
+
         public async Task<dynamic> GetBeneficiosFromEvento(Guid EventoId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
