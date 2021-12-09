@@ -461,15 +461,21 @@ namespace webAPI.DAO
                     ResponsavelInclusao = "Import Process"
                 };
 
-                var beneficiarioNaTabela = beneficiarios
-                    .Where(beneficiarioNaTabela => beneficiarioNaTabela.Cpf == beneficiario.Cpf).FirstOrDefault();
+                var beneficiarioRepetido = beneficiariosRelacao
+                    .Any(beneficiarioNaLista => beneficiarioNaLista.Cpf == beneficiario.Cpf);
 
-                if(beneficiarioNaTabela == null)
+                if(!beneficiarioRepetido)
                 {
-                    beneficiariosRelacao.Add(beneficiario);
-                    _context.Beneficiarios.Add(beneficiario);
-                }else {
-                    beneficiariosRelacao.Add(beneficiarioNaTabela);
+                    var beneficiarioNaTabela = beneficiarios
+                        .Where(beneficiarioNaTabela => beneficiarioNaTabela.Cpf == beneficiario.Cpf).FirstOrDefault();
+
+                    if(beneficiarioNaTabela == null)
+                    {
+                        beneficiariosRelacao.Add(beneficiario);
+                        _context.Beneficiarios.Add(beneficiario);
+                    }else {
+                        beneficiariosRelacao.Add(beneficiarioNaTabela);
+                    }
                 }
             }
 
@@ -510,15 +516,21 @@ namespace webAPI.DAO
                     DescricaoBeneficio = descricaoBeneficio
                 };
 
-                var beneficioNaTabela = beneficios
-                    .Where(beneficioNaTabela => beneficioNaTabela.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
+                var beneficioRepetido = beneficiosRelacao
+                    .Any(beneficioNaLista => beneficioNaLista.DescricaoBeneficio == beneficio.DescricaoBeneficio);
 
-                if(beneficioNaTabela == null)
+                if(!beneficioRepetido)
                 {
-                    beneficiosRelacao.Add(beneficio);
-                    _context.Beneficios.Add(beneficio);
-                }else {
-                    beneficiosRelacao.Add(beneficioNaTabela);
+                    var beneficioNaTabela = beneficios
+                        .Where(beneficioNaTabela => beneficioNaTabela.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
+
+                    if(beneficioNaTabela == null)
+                    {
+                        beneficiosRelacao.Add(beneficio);
+                        _context.Beneficios.Add(beneficio);
+                    }else {
+                        beneficiosRelacao.Add(beneficioNaTabela);
+                    }
                 }
             }
 
