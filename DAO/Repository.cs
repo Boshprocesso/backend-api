@@ -294,8 +294,8 @@ namespace webAPI.DAO
                         where bb.IdBeneficiario == cod
                         select new
                         {
-                            idProduto = b.IdBeneficio,
-                            beneficio = b.DescricaoBeneficio,
+                            idBeneficio = b.IdBeneficio,
+                            descricaoBeneficio = b.DescricaoBeneficio,
                             status = bb.Entregue,
                             quantidade = bb.Quantidade
                         });
@@ -356,7 +356,6 @@ namespace webAPI.DAO
 
             var consultaTerceiro = (from bb in BeneficiarioBeneficios.AsNoTracking()
                                     join t in Terceiros.AsNoTracking() on bb.IdTerceiro equals t.IdTerceiro
-
                                     where bb.IdBeneficiario == cod
                                     select new
                                     {
@@ -364,8 +363,103 @@ namespace webAPI.DAO
                                         nomeTerceiro = t.Nome
                                     });
             var terceiro = consultaTerceiro.FirstOrDefault();
+            
             return terceiro;
             
+        }
+        public async Task<dynamic> inserirTerceiro(TerceiroModel terceiro)
+        {   
+            IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
+            IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios;
+            IQueryable<Terceiro> Terceiros = _context.Terceiros;
+            
+            Guid codTerceiro;
+
+            if(terceiro.opcaoSelecionada == "cpf")
+            {   
+                terceiro.identificacaoTerceiro = terceiro.identificacaoTerceiro.Trim();
+                if(terceiro.identificacaoTerceiro.Length == 11)
+                {
+                    terceiro.identificacaoTerceiro = terceiro.identificacaoTerceiro.Insert(9,"-");
+                    terceiro.identificacaoTerceiro = terceiro.identificacaoTerceiro.Insert(6,".");
+                    terceiro.identificacaoTerceiro = terceiro.identificacaoTerceiro.Insert(3,".");
+                }
+                
+                
+                if((from b in Beneficiarios select b.Cpf).ToList().Contains(terceiro.identificacaoTerceiro))
+                {
+                    codTerceiro = (from b in Beneficiarios 
+                                    where b.Cpf == terceiro.identificacaoTerceiro
+                                    select b.IdBeneficiario).FirstOrDefault();
+
+                    if(!((from t in Terceiros select t.IdTerceiro).ToList().Contains(codTerceiro)))
+                    {
+                        Terceiro novoTerceiro = new Terceiro();
+                        novoTerceiro.IdTerceiro = codTerceiro;
+                        novoTerceiro.Identificacao = terceiro.identificacaoTerceiro;
+                        novoTerceiro.Nome = (from b in Beneficiarios where b.IdBeneficiario == codTerceiro select b.NomeCompleto).ToArray().FirstOrDefault();
+                        novoTerceiro.DataIndicacao = DateTime.Today;
+
+                        _context.Terceiros.Add(novoTerceiro);
+                    }
+                    (from bb in BeneficiarioBeneficios 
+                        where bb.IdBeneficiario == terceiro.cod select bb).ToList()
+                                                                                    .ForEach(elem => elem.IdTerceiro = codTerceiro);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    if(!((from t in Terceiros select t.Identificacao).ToList().Contains(terceiro.identificacaoTerceiro)))
+                    {
+                        Terceiro novoTerceiro = new Terceiro();
+                        novoTerceiro.Identificacao = terceiro.identificacaoTerceiro;
+                        novoTerceiro.Nome = terceiro.nomeTerceiro;
+                        novoTerceiro.DataIndicacao = DateTime.Today; 
+
+                        _context.Terceiros.Add(novoTerceiro);
+                        await _context.SaveChangesAsync();
+                    }
+                    codTerceiro = (from t in Terceiros where t.Identificacao == terceiro.identificacaoTerceiro select t.IdTerceiro).ToArray().FirstOrDefault();
+                    (from bb in BeneficiarioBeneficios 
+                        where bb.IdBeneficiario == terceiro.cod select bb).ToList()
+                                                                          .ForEach(elem => elem.IdTerceiro = ((from t in Terceiros
+                                                                                                               where t.Identificacao == terceiro.identificacaoTerceiro
+                                                                                                               select t.IdTerceiro).ToArray().FirstOrDefault()));
+                    
+                }
+            }
+           else
+           {
+                var edv = Convert.ToInt32(terceiro.identificacaoTerceiro);
+                codTerceiro = (from b in Beneficiarios 
+                                   where b.Edv == edv
+                                   select b.IdBeneficiario).FirstOrDefault();
+
+                if(!((from t in Terceiros select t.IdTerceiro).ToList().Contains(codTerceiro)))
+                {
+                    Terceiro novoTerceiro = new Terceiro();
+                    novoTerceiro.IdTerceiro = codTerceiro;
+                    novoTerceiro.Identificacao = terceiro.identificacaoTerceiro;
+                    novoTerceiro.Nome = (from b in Beneficiarios where b.IdBeneficiario == codTerceiro select b.NomeCompleto).ToArray().FirstOrDefault();
+                    novoTerceiro.DataIndicacao = DateTime.Today;
+
+                    _context.Terceiros.Add(novoTerceiro);
+                }
+                (from bb in BeneficiarioBeneficios 
+                    where bb.IdBeneficiario == terceiro.cod select bb).ToList()
+                                                                      .ForEach(elem => elem.IdTerceiro = codTerceiro);
+            }
+            await _context.SaveChangesAsync();
+
+            var resposta = (from t in Terceiros
+                            where t.IdTerceiro == codTerceiro
+                            select new
+                            {
+                                identificacaoTerceiro = t.Identificacao,
+                                nomeTerceiro = t.Nome
+                            });
+
+            return await resposta.ToArrayAsync();
         }
         public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
         {

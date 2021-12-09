@@ -29,7 +29,23 @@ namespace webAPI.Controllers
                 return BadRequest(null);  
             }
             catch (Exception ex){
-                return BadRequest($"Erro: {ex.Message}");
+                return Ok (null);
+            }
+            
+        }
+        [HttpPost("Terceiro")]
+        public async Task <IActionResult> inserirTerceiro(TerceiroModel terceiro)
+        {
+            try{
+                var result = await _repo.inserirTerceiro(terceiro);
+                if(result != null)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(null);  
+            }
+            catch (Exception ex){
+                return Ok ($"Erro: {ex.Message}");
             }
             
         }

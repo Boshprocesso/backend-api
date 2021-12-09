@@ -28,6 +28,7 @@ namespace webAPI.DAO
         Task<dynamic> GetLogin(Login login);
         Task<dynamic> GetBeneficios(Guid cod);
         Task<dynamic> GetTerceiro(Guid cod);
+        Task<dynamic> inserirTerceiro(TerceiroModel terceiro);
         Task inserirEvento(Evento evento);
 
         Task EditarEvento(Guid EventoId, Evento novoEvento);
