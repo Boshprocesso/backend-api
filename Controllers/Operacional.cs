@@ -34,7 +34,7 @@ namespace webAPI.Controllers
             
         }
         
-        [HttpPost("entregar")]
+        [HttpPost("/BeneficioEntregue")]
         public async Task<IActionResult> entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
         {
             if(beneficiosEntregues.Count == 0)

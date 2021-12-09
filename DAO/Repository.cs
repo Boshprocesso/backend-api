@@ -12,10 +12,6 @@ namespace webAPI.DAO
         public Repository (BOSHBENEFICIOContext context){
             _context = context;
         }
-        public async Task<bool> SaveChangesAsync()
-        {
-            return (await _context.SaveChangesAsync()) > 0;
-        }
 
         public async Task<Beneficiario[]> GetAllBeneficiarios()
         {
@@ -23,6 +19,11 @@ namespace webAPI.DAO
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficiario);
             return await query.ToArrayAsync();
         }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return (await _context.SaveChangesAsync()) > 0;
+        }
+        
 
         public async Task<Evento[]> GetAllEventos()
         {
@@ -31,7 +32,7 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
-        public async Task<Beneficio[]> GetBeneficosFromEvento(Guid EventoId){
+        public async Task<dynamic> GetBeneficiosFromEvento(Guid EventoId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
             IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
@@ -144,6 +145,22 @@ namespace webAPI.DAO
 
         }
 
+        public async Task EditarEvento(Guid EventoId, Evento novoEvento){
+            
+           
+            Evento nEvento = new Evento();
+            nEvento.IdEvento = EventoId;
+            nEvento.NomeEvento = novoEvento.NomeEvento;
+            nEvento.DescricaoEvento = novoEvento.DescricaoEvento;
+            nEvento.DataInicio = novoEvento.DataInicio;
+            nEvento.DataTermino = novoEvento.DataTermino;         
+
+            _context.Eventos.Update(nEvento);
+            await _context.SaveChangesAsync();  
+
+
+        }
+
         public async Task inserirBeneficio(Beneficio beneficio){
 
             _context.Beneficios.Add(beneficio);
@@ -151,6 +168,7 @@ namespace webAPI.DAO
         }
 
         public async Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio){
+
 
             IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
             IQueryable<Beneficio> benefconsulta = _context.Beneficios;
@@ -165,7 +183,26 @@ namespace webAPI.DAO
             ev.IdBeneficio = query;
 
             _context.EventoBeneficios.Add(ev);
+            await _context.SaveChangesAsync();
             
+        }
+
+        public async Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio)
+        {
+
+                IQueryable<Beneficio> benefconsulta = _context.Beneficios;                
+
+                var query = (
+                from b in benefconsulta        
+                where b.IdBeneficio == BeneficioId 
+                select b.IdBeneficio).First();
+
+                Beneficio ben = new Beneficio();
+                ben.IdBeneficio = query;
+                ben.DescricaoBeneficio = Descbeneficio.DescricaoBeneficio;
+
+                _context.Beneficios.Update(ben);
+                await _context.SaveChangesAsync();
         }
 
         public async Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
@@ -179,6 +216,7 @@ namespace webAPI.DAO
             _context.EventoBeneficios.Remove(busca);
             await _context.SaveChangesAsync();         
         }
+
 
 
 

@@ -16,7 +16,7 @@ namespace webAPI.Controllers
         public AdminController(IRepository repo){
             _repo = repo;
         }
-        [HttpGet]
+       /* [HttpGet]
         public async Task<IActionResult> GetBeneficiarios()
         {
             try{
@@ -27,8 +27,8 @@ namespace webAPI.Controllers
                 return BadRequest($"Erro: {ex.Message}");
             }
             
-        }
-        [HttpGet("/evento")]
+        }*/
+        [HttpGet("eventos")]
         public async Task<IActionResult> GetEvento()
         {
             try{
@@ -41,11 +41,11 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpGet("beneficioEvento/{EventoId}")]
+        [HttpGet("beneficiosEvento/{EventoId}")]
         public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
         {
             try{
-                var result = await _repo.GetBeneficosFromEvento(EventoId);
+                var result = await _repo.GetBeneficiosFromEvento(EventoId);
                 return Ok(result);
             }
             catch (Exception ex){
@@ -84,7 +84,23 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpDelete("deleteBeneficioEvento/{EventoId}/{BeneficioId}")]
+        [HttpPut("EditarEvento/evento/{EventoId}")]
+        public async Task<IActionResult> EditEvento(Guid EventoId, Evento novoEvento)
+        {
+            try{
+
+                await _repo.EditarEvento(EventoId,novoEvento);                               
+                var result = await _repo.GetEventobyId(EventoId);
+                
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpDelete("deleteBeneficioEvento/evento/{EventoId}/beneficio/{BeneficioId}")]
         public async Task<IActionResult> DeletarBeneficioFromEvento(Guid EventoId, Guid BeneficioId)
         {
             try{
@@ -101,16 +117,32 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpPost("adicionarBeneficioEvento")]
-        public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio)
+        [HttpPost("adicionarBeneficioEvento/evento/{EvendoId}")]
+        public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio) 
         {
             try{
 
                 await _repo.inserirBeneficio(beneficio);
-                await _repo.inserirBeneficioEvento(EventoId,beneficio);                
+                await _repo.inserirBeneficioEvento(EventoId,beneficio);               
                 var result = await _repo.GetUmBeneficioFromEvento(EventoId,beneficio);
                 
                 return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpPut("EditarBeneficio/evento/{EventoId}/beneficio/{BeneficioId}")]
+        public async Task<IActionResult> EditBeneficio(Guid EventoId, Guid BeneficioId,Beneficio Descbeneficio) 
+        {
+            try{
+
+                await _repo.editarBenficioFromEvento(EventoId,BeneficioId,Descbeneficio);                               
+                var result = await _repo.GetUmBeneficioFromEventobyId(EventoId,BeneficioId);
+                
+                return Ok(result);
             }
             catch (Exception ex){
                 return BadRequest($"Erro: {ex.Message}");
