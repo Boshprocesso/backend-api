@@ -221,13 +221,23 @@ namespace webAPI.DAO
             IQueryable<DateTime?>? data;
             String[]? nascimentoLogin;
             IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
-            if(login.cod.Length == 14)
+            if(login.cod.Length == 11)
             { 
                 data = (from Beneficiario in consultabb.AsNoTracking()
                             where Beneficiario.Cpf == login.cod 
                             select Beneficiario.DataNascimento);
                 nascimentoLogin = login.nascimento.Split('-');
                 Array.Reverse(nascimentoLogin);
+                
+
+                login.cod = login.cod.Trim();
+                if(login.cod.Length == 11)
+                {
+                    login.cod = login.cod.Insert(9,"-");
+                    login.cod = login.cod.Insert(6,".");
+                    login.cod = login.cod.Insert(3,".");
+                }
+                                  
                 if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
                 var query = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Cpf == login.cod
@@ -248,6 +258,7 @@ namespace webAPI.DAO
                             select Beneficiario.DataNascimento);
                 nascimentoLogin = login.nascimento.Split('-');
                 Array.Reverse(nascimentoLogin);
+                
                 if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
                 var query = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Edv == Convert.ToInt32(login.cod)
@@ -336,6 +347,26 @@ namespace webAPI.DAO
             return await resposta.ToListAsync();
 
             }
+
+        public async Task<dynamic> GetTerceiro(Guid cod)
+        {
+            IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
+            IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios;
+            IQueryable<Terceiro> Terceiros = _context.Terceiros;
+
+            var consultaTerceiro = (from bb in BeneficiarioBeneficios.AsNoTracking()
+                                    join t in Terceiros.AsNoTracking() on bb.IdTerceiro equals t.IdTerceiro
+
+                                    where bb.IdBeneficiario == cod
+                                    select new
+                                    {
+                                        identificacaoTerceiro = t.Identificacao,
+                                        nomeTerceiro = t.Nome
+                                    });
+            var terceiro = consultaTerceiro.FirstOrDefault();
+            return terceiro;
+            
+        }
         public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
         {
                 Guid idTerceiro, idBeneficiario;
