@@ -482,7 +482,11 @@ namespace webAPI.DAO
                        .ForEach(elem => elem.IdTerceiro = null); 
                         
             await _context.SaveChangesAsync();
-            return ("ok");
+            
+            return ((from t in Terceiros where t.IdTerceiro == codTerceiro select new{
+                                                                                        identificaoTerceiro = " ",
+                                                                                        nomeTerceiro = " "
+                                                                                     }));
         }
         public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
         {
