@@ -49,6 +49,22 @@ namespace webAPI.Controllers
             }
             
         }
+        [HttpDelete("delete/{idBeneficiario}/{idTerceiro}")]
+        public async Task <IActionResult> removerTerceiro(Guid idBeneficiario, Guid idTerceiro)
+        {
+            try{
+                var result = await _repo.removerTerceiro(idBeneficiario,idTerceiro);
+                if(result != null)
+                {
+                    return Ok(result);
+                }
+                return BadRequest("deu ruim");  
+            }
+            catch (Exception ex){
+                return Ok ($"Erro: {ex.Message}");
+            }
+            
+        }
     }
 
 }
