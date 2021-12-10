@@ -407,11 +407,16 @@ namespace webAPI.Controllers
                 return BadRequest("É necessário enviar as informações do Colaborador");
             }
             try{
+                Beneficiario beneficiario = beneficiarioDoEvento.colaborador;
                 List<BeneficioDoBeneficiario> beneficios = beneficiarioDoEvento.listaBeneficios;
 
-                Beneficiario beneficiario = (await _repo.GetColaboradorbyEdv(edv))[0];
+                Beneficiario[] beneficiarioNatabela = await _repo.GetColaboradorbyEdv(edv);
 
-                await _repo.EditarColaborador(beneficiario.Edv.Value, beneficiario);
+                if(beneficiarioNatabela.Length != 1) {
+                    return BadRequest("Esse beneficiario não está cadastrado");
+                }
+
+                await _repo.EditarColaborador(edv, beneficiario);
 
                 if(beneficios.Count > 0) {
                     foreach (var beneficio in beneficios)
@@ -421,7 +426,7 @@ namespace webAPI.Controllers
                             DescricaoBeneficio = beneficio.DescricaoBeneficio
                         };
 
-                        await _repo.inserirBeneficioColaborador(beneficiario.Edv.Value, beneficioParaInserir, beneficio.quantidade);                        
+                        await _repo.inserirBeneficioColaborador(edv, beneficioParaInserir, beneficio.quantidade);                        
                     }
                 }
                 
