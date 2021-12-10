@@ -1036,8 +1036,14 @@ namespace webAPI.DAO
                     IdEvento = idEvento,
                     IdBeneficiario = beneficiario.IdBeneficiario
                 };
+                
+                var eventoBeneficiariosNaTabela = eventoBeneficiarios
+                    .Where(eventoBeneficiariosNaTabela => eventoBeneficiariosNaTabela.IdEvento == eventoBeneficiario.IdEvento
+                        && eventoBeneficiariosNaTabela.IdBeneficiario == eventoBeneficiario.IdBeneficiario).FirstOrDefault();
 
-                _context.EventoBeneficiarios.Add(eventoBeneficiario);
+                if(eventoBeneficiariosNaTabela == null) {
+                    _context.EventoBeneficiarios.Add(eventoBeneficiario);
+                }
             }
             
             await _context.SaveChangesAsync();
@@ -1091,8 +1097,14 @@ namespace webAPI.DAO
                     IdEvento = idEvento,
                     IdBeneficio = beneficio.IdBeneficio
                 };
+                
+                var eventoBeneficiosNaTabela = eventoBeneficios
+                    .Where(eventoBeneficiosNaTabela => eventoBeneficiosNaTabela.IdEvento == eventoBeneficio.IdEvento
+                        && eventoBeneficiosNaTabela.IdBeneficio == eventoBeneficio.IdBeneficio).FirstOrDefault();
 
-                _context.EventoBeneficios.Add(eventoBeneficio);
+                if(eventoBeneficiosNaTabela == null) {
+                    _context.EventoBeneficios.Add(eventoBeneficio);
+                }
             }
             
             await _context.SaveChangesAsync();
