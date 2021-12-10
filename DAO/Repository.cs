@@ -778,7 +778,7 @@ namespace webAPI.DAO
                         novoTerceiro.IdTerceiro = codTerceiro;
                         novoTerceiro.Identificacao = terceiro.identificacaoTerceiro;
                         novoTerceiro.Nome = (from b in Beneficiarios where b.IdBeneficiario == codTerceiro select b.NomeCompleto).ToArray().FirstOrDefault();
-                        novoTerceiro.DataIndicacao = DateTime.Today;
+                        novoTerceiro.DataIndicacao = DateTime.Now;
 
                         _context.Terceiros.Add(novoTerceiro);
                     }
