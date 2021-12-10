@@ -618,7 +618,8 @@ namespace webAPI.DAO
                     login.cod = login.cod.Insert(3,".");
                 }
                                   
-                if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
+                if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin))
+                {
                 var query = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Cpf == login.cod
                             select new 
@@ -640,7 +641,7 @@ namespace webAPI.DAO
                 Array.Reverse(nascimentoLogin);
                 
                 if (Convert.ToString(data.FirstOrDefault()).Split(' ')[0] == String.Join('/',nascimentoLogin)){
-                var query = (from beneficiario in consultabb.AsNoTracking()
+                var resposta = (from beneficiario in consultabb.AsNoTracking()
                             where beneficiario.Edv == Convert.ToInt32(login.cod)
                             select new 
                             {
@@ -650,11 +651,7 @@ namespace webAPI.DAO
                                 administrativo = true,
                                 entregaproduto = true
                             });
-                var resposta = from beneficiario in consultabb.AsNoTracking()
-                            where beneficiario.Edv == Convert.ToInt32(login.cod)
-                            select new {
-                                login = query.ToArray()
-                            };
+                            
                     return await resposta.ToArrayAsync();
                 }
                 return null;
