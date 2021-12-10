@@ -39,7 +39,7 @@ namespace webAPI.Controllers
                  
                 await _repo.carregarBeneficiarioBeneficio(idEvento, payload.BeneficioBeneficiario);
 
-                return Ok("Dados Carregados");
+                return Ok(new { status = "ok" });
             }
             catch (Exception ex){
                 return StatusCode(500 , $"Erro: {ex.Message}");

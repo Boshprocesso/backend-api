@@ -400,14 +400,12 @@ namespace webAPI.DAO
             on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
             join beneficio in Beneficios
             on beneficiarioBeneficio.IdBeneficio equals beneficio.IdBeneficio
-            where beneficiarioBeneficio.Entregue == "0" && 
-                (beneficiarioBeneficio.IdBeneficiario == idBeneficiario
+            where (beneficiarioBeneficio.IdBeneficiario == idBeneficiario
                     || beneficiarioBeneficio.IdTerceiro == idTerceiro)
             select new {
                 Beneficio = beneficio.DescricaoBeneficio,
                 IdBeneficio = beneficio.IdBeneficio,
                 Quantidade = beneficiarioBeneficio.Quantidade,
-                Entregue = beneficiarioBeneficio.Entregue, 
                 IdBeneficiario = beneficiario.IdBeneficiario,
                 Beneficiario = beneficiario.NomeCompleto
             };
