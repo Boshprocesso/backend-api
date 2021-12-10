@@ -543,13 +543,17 @@ namespace webAPI.DAO
                 where c.IdEvento == EventoId 
                 select c.IdEvento).First();
 
+            EventoBeneficiario? eventoBeneficiarioNaTabela = consulta.Where(eb =>
+                eb.IdBeneficiario == queryColaborador && eb.IdEvento == queryEvento).FirstOrDefault();
+            
+            if(eventoBeneficiarioNaTabela == null) {
+                EventoBeneficiario BB = new EventoBeneficiario();
+                BB.IdBeneficiario = queryColaborador;
+                BB.IdEvento = queryEvento;
 
+                _context.EventoBeneficiarios.Add(BB);
+            }
 
-            EventoBeneficiario BB = new EventoBeneficiario();
-            BB.IdBeneficiario = queryColaborador;
-            BB.IdEvento = queryEvento;
-
-            _context.EventoBeneficiarios.Add(BB);
             await _context.SaveChangesAsync();
         }
 

@@ -398,6 +398,41 @@ namespace webAPI.Controllers
             }
                         
         }
+        
+        [HttpPut("/adicionarColaboradorEvento/eventoid/{EventoId}/edv/{edv}")]
+
+        public async Task<IActionResult> UpdateBeneficiarioEvento(Guid EventoId, int edv, BeneficiarioDoEvento beneficiarioDoEvento) 
+        {
+            if(beneficiarioDoEvento == null || beneficiarioDoEvento.colaborador == null || beneficiarioDoEvento.listaBeneficios == null) {
+                return BadRequest("É necessário enviar as informações do Colaborador");
+            }
+            try{
+                List<BeneficioDoBeneficiario> beneficios = beneficiarioDoEvento.listaBeneficios;
+
+                Beneficiario beneficiario = (await _repo.GetColaboradorbyEdv(edv))[0];
+
+                await _repo.EditarColaborador(beneficiario.Edv.Value, beneficiario);
+
+                if(beneficios.Count > 0) {
+                    foreach (var beneficio in beneficios)
+                    {
+                        Beneficio beneficioParaInserir = new Beneficio {
+                            IdBeneficio = beneficio.IdBeneficio,
+                            DescricaoBeneficio = beneficio.DescricaoBeneficio
+                        };
+
+                        await _repo.inserirBeneficioColaborador(beneficiario.Edv.Value, beneficioParaInserir, beneficio.quantidade);                        
+                    }
+                }
+                
+                
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
 
         [HttpDelete("/removerColaboradorEvento/eventoid/{EventoId}/edv/{edv}")]
 
