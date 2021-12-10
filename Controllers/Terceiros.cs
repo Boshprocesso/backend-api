@@ -49,7 +49,7 @@ namespace webAPI.Controllers
             }
             
         }
-        [HttpDelete("delete/{idBeneficiario}/{idTerceiro}")]
+        [HttpDelete("delete/{idBeneficiario}/{identificacaoTerceiro}")]
         public async Task <IActionResult> removerTerceiro(Guid idBeneficiario, Guid idTerceiro)
         {
             try{
