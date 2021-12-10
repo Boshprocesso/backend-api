@@ -407,12 +407,10 @@ namespace webAPI.DAO
                 Beneficio = beneficio.DescricaoBeneficio,
                 IdBeneficio = beneficio.IdBeneficio,
                 Quantidade = beneficiarioBeneficio.Quantidade,
+                Entregue = beneficiarioBeneficio.Entregue, 
                 IdBeneficiario = beneficiario.IdBeneficiario,
                 Beneficiario = beneficiario.NomeCompleto
             };
-            /* join eventoBeneficio in EventoBeneficios
-            on beneficio.IdBeneficio equals eventoBeneficio.IdBeneficio */
-                // && eventoBeneficio.IdEvento == idEvento
 
             query = query.Where(result => 
                 EventoBeneficiarios.Any(eb => eb.IdEvento == idEvento && eb.IdBeneficiario == result.IdBeneficiario));
