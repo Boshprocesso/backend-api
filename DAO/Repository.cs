@@ -469,12 +469,15 @@ namespace webAPI.DAO
             return await resposta.ToArrayAsync();
         }
 
-        public async Task<dynamic> removerTerceiro(Guid idBeneficiario, Guid idTerceiro)
+        public async Task<dynamic> removerTerceiro(Guid idBeneficiario, string identificacaoTerceiro)
         {
             IQueryable<Terceiro> Terceiros = _context.Terceiros;
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
+
+            var codTerceiro = (from t in Terceiros where t.Identificacao == identificacaoTerceiro select t.IdTerceiro).ToList().FirstOrDefault();
+
             (from bb in BeneficiarioBeneficios 
-             where bb.IdTerceiro == idTerceiro && bb.IdBeneficiario == idBeneficiario
+             where bb.IdBeneficiario == idBeneficiario && bb.IdTerceiro == codTerceiro
              select bb).ToList()
                        .ForEach(elem => elem.IdTerceiro = null); 
                         

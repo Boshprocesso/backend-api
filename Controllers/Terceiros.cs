@@ -50,10 +50,10 @@ namespace webAPI.Controllers
             
         }
         [HttpDelete("delete/{idBeneficiario}/{idTerceiro}")]
-        public async Task <IActionResult> removerTerceiro(Guid idBeneficiario, Guid idTerceiro)
+        public async Task <IActionResult> removerTerceiro(Guid idBeneficiario, string identificacaoTerceiro)
         {
             try{
-                var result = await _repo.removerTerceiro(idBeneficiario,idTerceiro);
+                var result = await _repo.removerTerceiro(idBeneficiario,identificacaoTerceiro);
                 if(result != null)
                 {
                     return Ok(result);
