@@ -192,10 +192,10 @@ namespace webAPI.Controllers
         public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio) 
         {
             try{
-
+                
                 await _repo.inserirBeneficio(beneficio);
-                await _repo.inserirBeneficioEvento(EventoId,beneficio);               
-                var result = await _repo.GetUmBeneficioFromEvento(EventoId,beneficio);
+                await _repo.inserirBeneficioEvento(EventoId,beneficio);
+                // var result = await _repo.GetUmBeneficioFromEvento(EventoId,beneficio);
                 
                 return Ok();
             }

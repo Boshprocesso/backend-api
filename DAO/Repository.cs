@@ -103,8 +103,12 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
         public async Task inserirBeneficio(Beneficio beneficio){
+            Beneficio? beneficiosNatabela = _context.Beneficios.Where(bnt => bnt.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
 
-            _context.Beneficios.Add(beneficio);
+            if(beneficiosNatabela == null) {
+                _context.Beneficios.Add(beneficio);
+            }
+
             await _context.SaveChangesAsync();
         }
         public async Task DeletarBeneficio (Guid BeneficioId){
@@ -228,11 +232,18 @@ namespace webAPI.DAO
                 where b.DescricaoBeneficio == beneficio.DescricaoBeneficio 
                 select b.IdBeneficio).First();
 
-            EventoBeneficio ev = new EventoBeneficio();
-            ev.IdEvento = EventoId;
-            ev.IdBeneficio = query;
+            EventoBeneficio? eventoBeneficioNaTabela = consulta.Where(bb =>
+                bb.IdBeneficio == query && bb.IdEvento == EventoId).FirstOrDefault();
+            
+            if(eventoBeneficioNaTabela == null)
+            {
+                EventoBeneficio ev = new EventoBeneficio();
+                ev.IdEvento = EventoId;
+                ev.IdBeneficio = query;
+                
+                _context.EventoBeneficios.Add(ev);
+            }
 
-            _context.EventoBeneficios.Add(ev);
             await _context.SaveChangesAsync();
             
         }
