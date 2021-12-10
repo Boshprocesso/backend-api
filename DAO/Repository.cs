@@ -478,8 +478,8 @@ namespace webAPI.DAO
                                             where benficioscolaborador.IdBeneficiario == colaborador.IdBeneficiario && benficioscolaborador.IdBeneficio == beneficios.IdBeneficio
                                         select new
                                         {                                       
-                                        idproduto = beneficios.IdBeneficio,
-                                        descricao = beneficios.DescricaoBeneficio,
+                                        idBeneficio = beneficios.IdBeneficio,
+                                        descricaoBeneficio = beneficios.DescricaoBeneficio,
                                         quantidade = benficioscolaborador.Quantidade,
                                         status = benficioscolaborador.Entregue}).ToList<dynamic>();
                 
