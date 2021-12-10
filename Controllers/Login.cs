@@ -29,7 +29,7 @@ namespace webAPI.Controllers
                 return BadRequest(null);  
             }
             catch (Exception ex){
-                return BadRequest($"Erro: {ex.Message}");
+                return Ok(null);
             }
             
         }
