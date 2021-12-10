@@ -31,4 +31,16 @@ namespace webAPI.Models
         public string? cpf { get; set; }
         public int? Quantidade { get; set; }
     }
+
+    public partial class BeneficiarioDoEvento
+    {
+        public Beneficiario? colaborador { get; set; }
+        public List<BeneficioDoBeneficiario>? listaBeneficios { get; set; }
+    }
+
+    public partial class BeneficioDoBeneficiario : Beneficio
+    {
+        public string? status  { get; set; }
+        public int quantidade  { get; set; }
+    }
 }

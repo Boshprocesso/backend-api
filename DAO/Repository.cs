@@ -322,8 +322,12 @@ namespace webAPI.DAO
 
         }
         public async Task inserirColaborador(Beneficiario colaborador){
+            Beneficiario? colaboradorNatabela = _context.Beneficiarios.Where(bnt => bnt.Cpf == colaborador.Cpf).FirstOrDefault();
 
-            _context.Beneficiarios.Add(colaborador);
+            if(colaboradorNatabela == null) {
+                _context.Beneficiarios.Add(colaborador);
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -379,7 +383,7 @@ namespace webAPI.DAO
                 return queryColaborador;
         }
 
-        public async Task inserirBeneficioColaborador(int edv,Beneficio beneficio){
+        public async Task inserirBeneficioColaborador(int edv,Beneficio beneficio, int quantidade){
 
 
             IQueryable<BeneficiarioBeneficio> consulta = _context.BeneficiarioBeneficios; 
@@ -398,14 +402,22 @@ namespace webAPI.DAO
                 select c.IdBeneficiario).First();
 
 
-
-            BeneficiarioBeneficio BB = new BeneficiarioBeneficio();
-            BB.IdBeneficiario = queryColaborador;
-            BB.IdBeneficio = queryBeneficio;
-
-            _context.BeneficiarioBeneficios.Add(BB);
-            await _context.SaveChangesAsync();
+            BeneficiarioBeneficio? beneficiarioBeneficioNaTabela = consulta.Where(bb =>
+                bb.IdBeneficiario == queryColaborador && bb.IdBeneficio == queryBeneficio).FirstOrDefault();
             
+            if(beneficiarioBeneficioNaTabela == null) {
+                BeneficiarioBeneficio BB = new BeneficiarioBeneficio();
+                BB.IdBeneficiario = queryColaborador;
+                BB.IdBeneficio = queryBeneficio;
+                BB.Quantidade = quantidade;
+
+                _context.BeneficiarioBeneficios.Add(BB);
+            } else {
+                beneficiarioBeneficioNaTabela.Quantidade = quantidade;
+                _context.BeneficiarioBeneficios.Update(beneficiarioBeneficioNaTabela);
+            }
+
+            await _context.SaveChangesAsync();            
         }
         
         public async Task<dynamic> GetBeneficiosFromColaborador(int edv){

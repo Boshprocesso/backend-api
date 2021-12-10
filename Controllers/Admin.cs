@@ -313,12 +313,12 @@ namespace webAPI.Controllers
         // COlaborador -> Beneficio
 
         [HttpPost("/adicionarBeneficioColaborador/edv/{edv}")]
-        public async Task<IActionResult> AddBeneficioBeneficiario(int edv,Beneficio beneficio) 
+        public async Task<IActionResult> AddBeneficioBeneficiario(int edv,Beneficio beneficio, int quantidade) 
         {
             try{
 
                 
-                await _repo.inserirBeneficioColaborador(edv,beneficio);               
+                await _repo.inserirBeneficioColaborador(edv,beneficio, quantidade);               
                 
                 
                 return Ok();
@@ -361,14 +361,34 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpPost("/adicionarColaboradorEvento/eventoid/{EventoId}/edv/{edv}")]
+        [HttpPost("/adicionarColaboradorEvento/eventoid/{EventoId}")]
 
-        public async Task<IActionResult> AddBeneficiarioEvento(Guid EventoId,int edv) 
+        public async Task<IActionResult> AddBeneficiarioEvento(Guid EventoId, BeneficiarioDoEvento beneficiarioDoEvento) 
         {
+            if(beneficiarioDoEvento == null || beneficiarioDoEvento.colaborador == null || beneficiarioDoEvento.listaBeneficios == null) {
+                return BadRequest("É necessário enviar as informações do Colaborador");
+            }
             try{
+                Beneficiario beneficiario = beneficiarioDoEvento.colaborador;
+                List<BeneficioDoBeneficiario> beneficios = beneficiarioDoEvento.listaBeneficios;
 
-                
-                await _repo.inserirBeneficiarioEvento(EventoId, edv);               
+                await _repo.inserirColaborador(beneficiario);
+
+                beneficiario = (await _repo.GetColaboradorbyEdv(beneficiario.Edv.Value))[0];
+
+                if(beneficios.Count > 0) {
+                    foreach (var beneficio in beneficios)
+                    {
+                        Beneficio beneficioParaInserir = new Beneficio {
+                            IdBeneficio = beneficio.IdBeneficio,
+                            DescricaoBeneficio = beneficio.DescricaoBeneficio
+                        };
+
+                        await _repo.inserirBeneficioColaborador(beneficiario.Edv.Value, beneficioParaInserir, beneficio.quantidade);                        
+                    }
+                }
+
+                await _repo.inserirBeneficiarioEvento(EventoId, beneficiario.Edv.Value);
                 
                 
                 return Ok();

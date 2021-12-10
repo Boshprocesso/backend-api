@@ -67,7 +67,7 @@ namespace webAPI.DAO
 
         //Colaborador - Beneficio
 
-        Task inserirBeneficioColaborador(int edv,Beneficio beneficio);
+        Task inserirBeneficioColaborador(int edv,Beneficio beneficio, int quantidade);
 
         Task<dynamic> GetBeneficiosFromColaborador(int edv); 
 
