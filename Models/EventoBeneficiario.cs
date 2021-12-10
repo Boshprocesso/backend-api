@@ -8,7 +8,7 @@ namespace webAPI.Models
         public Guid IdEvento { get; set; }
         public Guid IdBeneficiario { get; set; }
 
-        public virtual Beneficiario IdBeneficiarioNavigation { get; set; } = null!;
-        public virtual Evento IdEventoNavigation { get; set; } = null!;
+        public virtual Beneficiario? IdBeneficiarioNavigation { get; set; }
+        public virtual Evento? IdEventoNavigation { get; set; }
     }
 }

@@ -16,8 +16,8 @@ namespace webAPI.Controllers
         public OperacionalController(IRepository repo){
             _repo = repo;
         }
-        [HttpGet("/BeneficiosBeneficiario")]
-        public async Task<IActionResult> GetBeneficiosParaEntregar([FromQuery(Name="identificacao")] string? identificacao)
+        [HttpGet("{idEvento}/{idIlha}")]
+        public async Task<IActionResult> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, [FromQuery(Name="identificacao")] string? identificacao)
         {
             if(identificacao == null)
             {
@@ -25,7 +25,7 @@ namespace webAPI.Controllers
             }
 
             try{
-                var result = await _repo.GetBeneficiosParaEntregar(identificacao);
+                var result = await _repo.GetBeneficiosParaEntregar(idEvento, idIlha, identificacao);
                 return Ok(result);
             }
             catch (Exception ex){
@@ -35,19 +35,14 @@ namespace webAPI.Controllers
         }
         
         [HttpPost("/BeneficioEntregue")]
-        public async Task<IActionResult> entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
-        {
-            if(beneficiosEntregues.Count == 0)
-            {
-                return StatusCode(400, "Informe ao menos um benefício para entregua");
-            }
-            
+        public async Task<IActionResult> entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue)
+        {            
             try{
-                _repo.entregarBeneficios(beneficiosEntregues);
+                _repo.entregarBeneficios(beneficioEntregue);
 
                 if(await _repo.SaveChangesAsync())
                 {
-                    return Ok("Beneficios entregues");
+                    return Ok(new { messagem = "Beneficios entregues"});
                 }
             }
             catch (Exception ex){

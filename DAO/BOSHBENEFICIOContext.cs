@@ -32,7 +32,7 @@ namespace webAPI.DAO
             if (!optionsBuilder.IsConfigured)
             {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Integrated Security=SSPI;Persist Security Info=False;Data Source=desktop-asp7hdm;Initial Catalog=BOSHBENEFICIO", options => options.EnableRetryOnFailure());
+                optionsBuilder.UseSqlServer("workstation id=BOSHBENEFICIO.mssql.somee.com;packet size=4096;user id=grupobosch04_SQLLogin_1;pwd=tx4pa7olx8;data source=BOSHBENEFICIO.mssql.somee.com;persist security info=False;initial catalog=BOSHBENEFICIO;");
             }
         }
 
@@ -176,8 +176,7 @@ namespace webAPI.DAO
 
             modelBuilder.Entity<EventoBeneficiario>(entity =>
             {
-                entity.HasKey(e => new {e.IdEvento, e.IdBeneficiario})
-                    .HasName("PK__Evento__C8DC7BDAA64D1C18");
+                entity.HasKey(e => new {e.IdEvento, e.IdBeneficiario});
 
                 entity.ToTable("EventoBeneficiario");
 
@@ -200,8 +199,7 @@ namespace webAPI.DAO
 
             modelBuilder.Entity<EventoBeneficio>(entity =>
             {
-                entity.HasKey(e => new {e.IdEvento, e.IdBeneficio})
-                    .HasName("PK__Evento__C8DC7BDAA64D1C18");
+                entity.HasKey(e => new {e.IdEvento, e.IdBeneficio});
 
                 entity.ToTable("EventoBeneficio");
 
