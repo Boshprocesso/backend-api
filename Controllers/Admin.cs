@@ -16,19 +16,10 @@ namespace webAPI.Controllers
         public AdminController(IRepository repo){
             _repo = repo;
         }
-        [HttpGet("BeneficiarioEventos")]
-        public async Task<IActionResult> GetEventBeneficiarios()
-        {
-            try{
-                var result = await _repo.GetAllEventoBeneficiarios();
-                return Ok(result);
-            }
-            catch (Exception ex){
-                return BadRequest($"Erro: {ex.Message}");
-            }
-            
-        }
-        [HttpGet("eventos")]
+
+        // Evento
+        
+        [HttpGet("/eventos")]
         public async Task<IActionResult> GetEvento()
         {
             try{
@@ -41,24 +32,14 @@ namespace webAPI.Controllers
             
         }
 
-        [HttpGet("beneficiosEvento/{EventoId}")]
-        public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
-        {
-            try{
-                var result = await _repo.GetBeneficiosFromEvento(EventoId);
-                return Ok(result);
-            }
-            catch (Exception ex){
-                return BadRequest($"Erro: {ex.Message}");
-            }
-            
-        }
 
-        [HttpDelete("deleteEvento/{EventoId}")]
+
+        [HttpDelete("/deletarEvento/{EventoId}")]
         public async Task<IActionResult> DeleteEvento(Guid EventoId)
         {
             try{
                 var result = await _repo.GetEventobyId(EventoId);
+                await _repo.RemoverEventoFromEventoBeneficio(EventoId);
                 await _repo.RemoverEvento(EventoId);
                 return Ok(result);
             }
@@ -67,8 +48,8 @@ namespace webAPI.Controllers
             }
                         
         }
-
-        [HttpPost("adicionarEvento")]
+        
+        [HttpPost("/adicionarEvento")]
         public async Task<IActionResult> AddEvento(Evento evento)
         {
             try{
@@ -83,8 +64,7 @@ namespace webAPI.Controllers
             }
                         
         }
-
-        [HttpPut("EditarEvento/evento/{EventoId}")]
+        [HttpPut("/editarEvento/evento/{EventoId}")]
         public async Task<IActionResult> EditEvento(Guid EventoId, Evento novoEvento)
         {
             try{
@@ -100,7 +80,98 @@ namespace webAPI.Controllers
                         
         }
 
-        [HttpDelete("deleteBeneficioEvento/evento/{EventoId}/beneficio/{BeneficioId}")]
+
+        //Beneficio
+
+        [HttpGet("/beneficios")]
+        public async Task<IActionResult> GetBeneficios()
+        {
+            try{
+                var result = await _repo.GetAllBeneficios();
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+        [HttpGet("/beneficiobyId")]
+        public async Task<IActionResult> GetBeneficioporId(Guid BeneficioId)
+        {
+            try{
+                var result = await _repo.GetBeneficiobyId(BeneficioId);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+
+
+        [HttpDelete("/deletarBeneficio/{BeneficioId}")]
+        public async Task<IActionResult> DeleteBeneficio(Guid BeneficioId)
+        {
+            try{
+                var result = await _repo.GetBeneficiobyId(BeneficioId);
+                await _repo.RemoverBeneficioFromEventoBeneficio(BeneficioId);
+                await _repo.DeletarBeneficio(BeneficioId);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpPost("/adicionarBeneficio")]
+        public async Task<IActionResult> AddBeneficio(Beneficio beneficio)
+        {
+            try{
+
+                await _repo.inserirBeneficio(beneficio);              
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpPut("/editarBeneficio/{beneficioId}")]
+        public async Task<IActionResult> EditarBeneficio(Guid beneficioId,Beneficio Descbeneficio)
+        {
+            try{
+
+                await _repo.editarBenficio(beneficioId,Descbeneficio);              
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+        
+        //Beneficio -> Evento
+
+        [HttpGet("/beneficiosEvento/{EventoId}")]
+        public async Task<IActionResult> GetBeneficiosEvento(Guid EventoId)
+        {
+            try{
+                var result = await _repo.GetBeneficiosFromEvento(EventoId);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+
+        
+        [HttpDelete("/deletarBeneficioEvento/evento/{EventoId}/beneficio/{BeneficioId}")]
         public async Task<IActionResult> DeletarBeneficioFromEvento(Guid EventoId, Guid BeneficioId)
         {
             try{
@@ -116,8 +187,8 @@ namespace webAPI.Controllers
             }
                         
         }
-
-        [HttpPost("adicionarBeneficioEvento/evento/{EvendoId}")]
+        
+        [HttpPost("/adicionarBeneficioEvento/evento/{EventoId}")]
         public async Task<IActionResult> AddBeneficioEvento(Guid EventoId,Beneficio beneficio) 
         {
             try{
@@ -133,13 +204,13 @@ namespace webAPI.Controllers
             }
                         
         }
-
-        [HttpPut("EditarBeneficio/evento/{EventoId}/beneficio/{BeneficioId}")]
+        
+        [HttpPut("/EditarBeneficio/evento/{EventoId}/beneficio/{BeneficioId}")]
         public async Task<IActionResult> EditBeneficio(Guid EventoId, Guid BeneficioId,Beneficio Descbeneficio) 
         {
             try{
 
-                await _repo.editarBenficioFromEvento(EventoId,BeneficioId,Descbeneficio);                               
+                await _repo.editarBenficio(BeneficioId,Descbeneficio);                             
                 var result = await _repo.GetUmBeneficioFromEventobyId(EventoId,BeneficioId);
                 
                 return Ok(result);
@@ -149,6 +220,205 @@ namespace webAPI.Controllers
             }
                         
         }
+
+
+        //Colaborador
+
+        [HttpGet("/colaboradores")]
+
+        public async Task<IActionResult> GetBeneficiarios()
+        {
+            try{
+                var result = await _repo.GetAllColaboradores();
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+
+        
+
+        [HttpGet("/colaboradobyId/{ColabId}")]
+        public async Task<IActionResult> GetBeneficiariobyId(Guid ColabId)
+        {
+            try{
+                var result = await _repo.GetColaboradorbyId(ColabId);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+        [HttpGet("/colaboradobyEdv/{edv}")]
+        public async Task<IActionResult> GetBeneficiariobyEdv(int edv)
+        {
+            try{
+                var result = await _repo.GetColaboradorbyEdv(edv);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+        [HttpPost("/adicionarColaborador")]
+        public async Task<IActionResult> AddColaborador(Beneficiario colaborador)
+        {
+            try{
+
+                await _repo.inserirColaborador(colaborador);              
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpPut("/editarColaborador/{edv}")]
+        public async Task<IActionResult> EditarBeneficiario(int edv,Beneficiario colaborador)
+        {
+            try{
+
+                await _repo.EditarColaborador(edv,colaborador);              
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpDelete("/deletarColaborador/edv/{edv}")]
+        public async Task<IActionResult> DeleteColaborador(int edv)
+        {
+            try{
+                var result = await _repo.GetColaboradorbyEdv(edv);
+                await _repo.RemoverColaboradorfromBeneficiarioBeneficios(edv);
+                await _repo.DeletarColaborador(edv);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        // COlaborador -> Beneficio
+
+        [HttpPost("/adicionarBeneficioColaborador/edv/{edv}")]
+        public async Task<IActionResult> AddBeneficioBeneficiario(int edv,Beneficio beneficio) 
+        {
+            try{
+
+                
+                await _repo.inserirBeneficioColaborador(edv,beneficio);               
+                
+                
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpGet("/GetBeneficiosColaborador/edv/{edv}")]
+        public async Task<IActionResult> ListarBeneficioBeneficiario(int edv) 
+        {
+            try{
+
+
+                var result = await _repo.GetBeneficiosFromColaborador(edv);
+
+
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        // Evento Beneficiario
+        
+        [HttpGet("/colaboradoresEvento/{EventoId}")]
+        public async Task<IActionResult> GetEventBeneficiarios(Guid EventoId)
+        {
+            try{
+                var result = await _repo.GetAllBeneficiariosEvento(EventoId);
+                return Ok(result);
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+            
+        }
+
+        [HttpPost("/adicionarColaboradorEvento/eventoid/{EventoId}/edv/{edv}")]
+
+        public async Task<IActionResult> AddBeneficiarioEvento(Guid EventoId,int edv) 
+        {
+            try{
+
+                
+                await _repo.inserirBeneficiarioEvento(EventoId, edv);               
+                
+                
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+
+        [HttpDelete("/removerColaboradorEvento/eventoid/{EventoId}/edv/{edv}")]
+
+        public async Task<IActionResult> DeleteBeneficiarioEvento(Guid EventoId,int edv) 
+        {
+            try{
+
+                
+                await _repo.RemoverUmBeneficiarioFromEvento(EventoId, edv);               
+                
+                
+                return Ok();
+            }
+            catch (Exception ex){
+                return BadRequest($"Erro: {ex.Message}");
+            }
+                        
+        }
+        
+        
+
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
     }
 
 }

@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using webAPI.Models;
+using System;
+
 
 
 namespace webAPI.DAO
@@ -19,21 +22,115 @@ namespace webAPI.DAO
             return (await _context.SaveChangesAsync()) > 0;}
         
         
-
+// EVENTOS
         public async Task<Evento[]> GetAllEventos()
         {
             IQueryable<Evento> query = _context.Eventos;
             query = query.AsNoTracking().OrderBy(c => c.IdEvento);
             return await query.ToArrayAsync();
+        } 
+        public async Task<dynamic> GetEventobyId(Guid EventoId){
+        
+            IQueryable<Evento> consultabb = _context.Eventos;
+
+            var resposta = (from c in consultabb
+                            where c.IdEvento == EventoId
+                            select new {
+                            nomeEvento = c.NomeEvento,
+                            descricaoEvento = c.DescricaoEvento,
+                            dataInicio = c.DataInicio,
+                            dataFim = c.DataTermino,
+                            idEvento = c.IdEvento});
+                
+                resposta = resposta.AsNoTracking();
+                return await resposta.ToArrayAsync();
+         }
+         public async Task<dynamic> GetEvento(Evento evento){
+
+             IQueryable<Evento> consultabb = _context.Eventos;
+
+             var resposta = (from c in consultabb
+                            where c.NomeEvento == evento.NomeEvento &&
+                            c.DataInicio == evento.DataInicio &&
+                            c.DataTermino == evento.DataTermino
+                            select c);
+            resposta = resposta.AsNoTracking();
+            return await resposta.ToArrayAsync();
+         }
+         public async Task RemoverEvento(Guid EventoId){
+
+            IQueryable<Evento> consultabb = _context.Eventos; 
+            
+            var busca = (from c in consultabb
+            where c.IdEvento == EventoId
+            select c).FirstOrDefault();               
+            _context.Eventos.Remove(busca);
+            await _context.SaveChangesAsync();         
+        }
+        public async Task inserirEvento(Evento evento){
+
+            _context.Eventos.Add(evento);           
+            await _context.SaveChangesAsync();
+
+        }
+        public async Task EditarEvento(Guid EventoId, Evento novoEvento){
+            
+           
+            Evento nEvento = new Evento();
+            nEvento.IdEvento = EventoId;
+            nEvento.NomeEvento = novoEvento.NomeEvento;
+            nEvento.DescricaoEvento = novoEvento.DescricaoEvento;
+            nEvento.DataInicio = novoEvento.DataInicio;
+            nEvento.DataTermino = novoEvento.DataTermino;         
+
+            _context.Eventos.Update(nEvento);
+            await _context.SaveChangesAsync();  
+
+
         }
 
-        public async Task<EventoBeneficiario[]> GetAllEventoBeneficiarios()
+        // BENEFICIO 
+        public async Task<Beneficio[]> GetAllBeneficios()
         {
-            IQueryable<EventoBeneficiario> query = _context.EventoBeneficiarios;
-            query = query.AsNoTracking().OrderBy(c => c.IdEvento);
+            IQueryable<Beneficio> query = _context.Beneficios;
+            query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);
             return await query.ToArrayAsync();
         }
+        public async Task inserirBeneficio(Beneficio beneficio){
 
+            _context.Beneficios.Add(beneficio);
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeletarBeneficio (Guid BeneficioId){
+
+            IQueryable<Beneficio> consultabb = _context.Beneficios; 
+            
+            var busca = (from c in consultabb
+            where c.IdBeneficio == BeneficioId
+            select c).FirstOrDefault();               
+            _context.Beneficios.Remove(busca);
+            await _context.SaveChangesAsync(); 
+
+        }
+
+        public async Task<dynamic> GetBeneficiobyId(Guid BeneficioId){
+
+             IQueryable<Beneficio> consultabb = _context.Beneficios;
+
+            var resposta = (from c in consultabb
+                            where c.IdBeneficio == BeneficioId
+                            select c);                            
+                
+                resposta = resposta.AsNoTracking();
+                return await resposta.ToArrayAsync();
+                //return resposta;
+         }
+        
+
+
+
+
+        // BENEFICIO -> EVENTO 
         public async Task<dynamic> GetBeneficiosFromEvento(Guid EventoId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
@@ -52,7 +149,6 @@ namespace webAPI.DAO
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);         
             return await query.ToArrayAsync();    
         }
-
         public async Task<dynamic> GetUmBeneficioFromEventobyId(Guid EventoId, Guid BeneficioId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
@@ -74,7 +170,6 @@ namespace webAPI.DAO
 
 
         }
-
         public async Task<dynamic> GetUmBeneficioFromEvento(Guid EventoId, Beneficio beneficio){
 
             IQueryable<EventoBeneficio> consulta = _context.EventoBeneficios; 
@@ -100,79 +195,26 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
 
         }
+        public async Task RemoverBeneficioFromEventoBeneficio(Guid BeneficioId){
 
-         public async Task<dynamic> GetEventobyId(Guid EventoId){
-        
-            IQueryable<Evento> consultabb = _context.Eventos;
-
-            var resposta = (from c in consultabb
-                            where c.IdEvento == EventoId
-                            select new {
-                            nomeEvento = c.NomeEvento,
-                            descricaoEvento = c.DescricaoEvento,
-                            dataInicio = c.DataInicio,
-                            dataFim = c.DataTermino,
-                            idEvento = c.IdEvento});
-                
-                resposta = resposta.AsNoTracking();
-                return await resposta.ToArrayAsync();
-         }
-
-         public async Task<dynamic> GetEvento(Evento evento){
-
-             IQueryable<Evento> consultabb = _context.Eventos;
-
-             var resposta = (from c in consultabb
-                            where c.NomeEvento == evento.NomeEvento &&
-                            c.DataInicio == evento.DataInicio &&
-                            c.DataTermino == evento.DataTermino
-                            select c);
-            resposta = resposta.AsNoTracking();
-            return await resposta.ToArrayAsync();
-         }
-
-
-
-        public async Task RemoverEvento(Guid EventoId){
-
-            IQueryable<Evento> consultabb = _context.Eventos; 
+            IQueryable<EventoBeneficio> consultaeb = _context.EventoBeneficios; 
             
-            var busca = (from c in consultabb
-            where c.IdEvento == EventoId
-            select c).FirstOrDefault();               
-            _context.Eventos.Remove(busca);
-            await _context.SaveChangesAsync();         
-        }
+            var busca = (from c in consultaeb
+            where c.IdBeneficio == BeneficioId
+            select c.IdBeneficio).ToList();
 
-        public async Task inserirEvento(Evento evento){
+            foreach(Guid Id in busca){
 
-            _context.Eventos.Add(evento);
+                var query = (from c in consultaeb
+                            where c.IdBeneficio == Id
+                            select c).First();
+
+            _context.EventoBeneficios.Remove(query);            
+            }               
+            
             await _context.SaveChangesAsync();
 
         }
-
-        public async Task EditarEvento(Guid EventoId, Evento novoEvento){
-            
-           
-            Evento nEvento = new Evento();
-            nEvento.IdEvento = EventoId;
-            nEvento.NomeEvento = novoEvento.NomeEvento;
-            nEvento.DescricaoEvento = novoEvento.DescricaoEvento;
-            nEvento.DataInicio = novoEvento.DataInicio;
-            nEvento.DataTermino = novoEvento.DataTermino;         
-
-            _context.Eventos.Update(nEvento);
-            await _context.SaveChangesAsync();  
-
-
-        }
-
-        public async Task inserirBeneficio(Beneficio beneficio){
-
-            _context.Beneficios.Add(beneficio);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task inserirBeneficioEvento(Guid EventoId,Beneficio beneficio){
 
 
@@ -192,8 +234,7 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();
             
         }
-
-        public async Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio)
+        public async Task editarBenficio(Guid BeneficioId, Beneficio Descbeneficio)
         {
 
                 IQueryable<Beneficio> benefconsulta = _context.Beneficios;                
@@ -210,7 +251,6 @@ namespace webAPI.DAO
                 _context.Beneficios.Update(ben);
                 await _context.SaveChangesAsync();
         }
-
         public async Task RemoverUmBeneficioFromEvento(Guid EventoId, Guid BeneficioId){
 
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
@@ -222,6 +262,339 @@ namespace webAPI.DAO
             _context.EventoBeneficios.Remove(busca);
             await _context.SaveChangesAsync();         
         }
+
+        public async Task RemoverEventoFromEventoBeneficio(Guid EventoId){
+
+            IQueryable<EventoBeneficio> consultaeb = _context.EventoBeneficios; 
+            
+            var busca = (from c in consultaeb
+            where c.IdEvento == EventoId
+            select c.IdEvento).ToList();
+
+            foreach(Guid Id in busca){
+
+                var query = (from c in consultaeb
+                            where c.IdEvento == Id
+                            select c).First();
+
+            _context.EventoBeneficios.Remove(query);            
+            }               
+            
+            await _context.SaveChangesAsync();
+
+        }
+
+
+
+        // COLABORADOR
+
+        public async Task<dynamic> GetAllColaboradores(){
+
+            IQueryable<Beneficiario> query = _context.Beneficiarios;
+            query = query.AsNoTracking().OrderBy(c => c.IdBeneficiario);
+            return await query.ToArrayAsync();
+        }
+
+        public async Task<dynamic> GetColaboradorbyEdv(int edv){
+
+            IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
+
+            var resposta = (from c in consultabb
+                            where c.Edv == edv
+                            select c);                            
+                
+                resposta = resposta.AsNoTracking();
+                return await resposta.ToArrayAsync();
+        }
+
+        public async Task<dynamic> GetColaboradorbyId(Guid ColabId){
+
+            IQueryable<Beneficiario> consultabb = _context.Beneficiarios;
+
+            var resposta = (from c in consultabb
+                            where c.IdBeneficiario == ColabId
+                            select c);                            
+                
+                resposta = resposta.AsNoTracking();
+                return await resposta.ToArrayAsync();
+
+        }
+        public async Task inserirColaborador(Beneficiario colaborador){
+
+            _context.Beneficiarios.Add(colaborador);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task EditarColaborador (int edv, Beneficiario colaborador){
+
+             IQueryable<Beneficiario> benefconsulta = _context.Beneficiarios;                
+
+                var query = (
+                from b in benefconsulta        
+                where b.Edv == edv 
+                select b.IdBeneficiario).First();
+
+                Beneficiario colab = new Beneficiario();
+                colab.NomeCompleto = colaborador.NomeCompleto;
+                colab.Cpf = colaborador.Cpf;
+                colab.DataNascimento = colaborador.DataNascimento;
+                colab.Unidade=colaborador.Unidade;                
+                colab.DataInclusao = colaborador.DataInclusao;
+                colab.ResponsavelInclusao = colaborador.ResponsavelInclusao;
+                colab.Edv = edv;
+                colab.IdBeneficiario = query;         
+
+                _context.Beneficiarios.Update(colab);
+                await _context.SaveChangesAsync();
+        }
+
+        public async Task DeletarColaborador (int edv)
+        {
+
+            IQueryable<Beneficiario> consultabb = _context.Beneficiarios; 
+            
+            var busca = (from c in consultabb
+            where c.Edv == edv
+            select c).FirstOrDefault();               
+            _context.Beneficiarios.Remove(busca);
+            await _context.SaveChangesAsync(); 
+
+        }
+
+
+
+        //BENEFICIO -> COLABORADOR
+
+        private Guid GetIdfromColaborador(int edv)
+        {
+            IQueryable<Beneficiario> Colabconsulta = _context.Beneficiarios;
+
+            var queryColaborador = (
+                from c in Colabconsulta        
+                where c.Edv == edv 
+                select c.IdBeneficiario).First();
+
+                return queryColaborador;
+        }
+
+        public async Task inserirBeneficioColaborador(int edv,Beneficio beneficio){
+
+
+            IQueryable<BeneficiarioBeneficio> consulta = _context.BeneficiarioBeneficios; 
+            IQueryable<Beneficio> benefconsulta = _context.Beneficios;
+            IQueryable<Beneficiario> Colabconsulta = _context.Beneficiarios;
+
+
+           var queryBeneficio = (
+                from b in benefconsulta        
+                where b.DescricaoBeneficio == beneficio.DescricaoBeneficio 
+                select b.IdBeneficio).First();
+            
+            var queryColaborador = (
+                from c in Colabconsulta        
+                where c.Edv == edv 
+                select c.IdBeneficiario).First();
+
+
+
+            BeneficiarioBeneficio BB = new BeneficiarioBeneficio();
+            BB.IdBeneficiario = queryColaborador;
+            BB.IdBeneficio = queryBeneficio;
+
+            _context.BeneficiarioBeneficios.Add(BB);
+            await _context.SaveChangesAsync();
+            
+        }
+        
+        public async Task<dynamic> GetBeneficiosFromColaborador(int edv){
+
+        IQueryable<BeneficiarioBeneficio> consultabb = _context.BeneficiarioBeneficios; 
+        IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
+
+            var colabId = GetIdfromColaborador(edv);
+
+            var queryBeneficios = (
+                from b in benefconsultabb                
+                join bb in consultabb on b.IdBeneficio equals bb.IdBeneficio
+                where bb.IdBeneficiario == colabId
+                select new  {
+                    codFuncionario = edv,
+                    IdBeneficio = b.IdBeneficio,
+                    descricaoBeneficio = b.DescricaoBeneficio
+                });
+
+            queryBeneficios = queryBeneficios.AsNoTracking().OrderBy(c => c.IdBeneficio);         
+            return await queryBeneficios.ToArrayAsync();
+        }
+
+        public async Task RemoverColaboradorfromBeneficiarioBeneficios(int edv){
+             
+             var colabId = GetIdfromColaborador(edv);
+
+             IQueryable<BeneficiarioBeneficio> consultaeb = _context.BeneficiarioBeneficios; 
+            
+            var busca = (from c in consultaeb
+            where c.IdBeneficiario == colabId
+            select c.IdBeneficiario).ToList();
+
+            foreach(Guid Id in busca){
+
+                var query = (from c in consultaeb
+                            where c.IdBeneficiario == Id
+                            select c).First();
+
+            _context.BeneficiarioBeneficios.Remove(query);            
+            }               
+            
+            await _context.SaveChangesAsync();
+             
+             }
+
+
+        // EVENTO -> COLABORADOR
+
+        public async Task<dynamic> GetAllBeneficiariosEvento(Guid EventoId)
+        {
+            
+
+            IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios; 
+            IQueryable<Beneficiario> consultaColab = _context.Beneficiarios;
+
+            var query = (
+                from b in consultaColab               
+                join eb in consultaeb on b.IdBeneficiario equals eb.IdBeneficiario
+                where eb.IdEvento == EventoId
+                select new  {
+                    
+                    IdEvento = eb.IdEvento,
+                    Edv = b.Edv,
+                    NomeCompleto = b.NomeCompleto,
+                    Cpf = b.Cpf,                    
+                    Unidade=b.Unidade,                
+                    DataInclusao = b.DataInclusao                    
+                });
+
+            query = query.OrderBy(c => c.Edv);         
+            return await query.ToArrayAsync();
+        }
+
+        public async Task inserirBeneficiarioEvento(Guid EventoId,int edv){
+
+            IQueryable<EventoBeneficiario> consulta = _context.EventoBeneficiarios; 
+            IQueryable<Beneficiario> benefconsulta = _context.Beneficiarios;
+            IQueryable<Evento> Eventoconsulta = _context.Eventos;
+
+            Guid ColabId = GetIdfromColaborador(edv);
+
+
+           var queryColaborador = (
+                from b in benefconsulta        
+                where b.IdBeneficiario == ColabId 
+                select b.IdBeneficiario).First();
+            
+            var queryEvento = (
+                from c in Eventoconsulta        
+                where c.IdEvento == EventoId 
+                select c.IdEvento).First();
+
+
+
+            EventoBeneficiario BB = new EventoBeneficiario();
+            BB.IdBeneficiario = queryColaborador;
+            BB.IdEvento = queryEvento;
+
+            _context.EventoBeneficiarios.Add(BB);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverUmBeneficiarioFromEvento(Guid EventoId, int edv)
+        {
+            var colabId = GetIdfromColaborador(edv);
+
+             IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios;             
+            
+            var busca = (from c in consultaeb
+            where c.IdEvento == EventoId &&
+            c.IdBeneficiario == colabId
+            select c).FirstOrDefault(); 
+
+            _context.EventoBeneficiarios.Remove(busca);
+            await _context.SaveChangesAsync();
+             
+             }
+        
+        public async Task<dynamic> GetUmColaboradorFromEventobyEdv(Guid EventoId, int edv){
+
+            IQueryable<EventoBeneficiario> consulta = _context.EventoBeneficiarios; 
+            IQueryable<Beneficiario> benefconsulta = _context.Beneficiarios;
+
+            Guid colabId = GetIdfromColaborador(edv);
+
+            var busca = (
+                from b in benefconsulta
+                where b.IdBeneficiario == colabId                
+                select b);
+
+                var query = (
+                from b in benefconsulta                
+                join eb in consulta on colabId equals eb.IdBeneficiario
+                where eb.IdEvento == EventoId &&
+                eb.IdBeneficiario == colabId
+                select new  {                    
+                    IdEvento = eb.IdEvento,
+                    Edv = b.Edv,
+                    NomeCompleto = b.NomeCompleto,
+                    Cpf = b.Cpf,                    
+                    Unidade=b.Unidade,                
+                    DataInclusao = b.DataInclusao              
+                    
+                });
+
+            query = query.AsNoTracking().OrderBy(c => c.Edv);         
+            return await query.ToArrayAsync();
+        }
+
+        /*public async Task <dynamic> GetAllBeneficiariosBeneficiosFromEvento(Guid EventoId){
+
+            //GetBeneficiariosEvento
+            IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios; 
+            IQueryable<Beneficiario> consultaColab = _context.Beneficiarios;
+
+            var query = (
+                from eb in consultaeb              
+                where eb.IdEvento == EventoId
+                select eb.IdBeneficiario).ToList();
+
+            //GetEventoBeneficiario
+                        
+
+            foreach( Guid colab in query){
+                await GetColaboradorbyId(colab);
+                GetBeneficiosFromColaborador
+                
+            }
+
+            
+
+                
+
+            
+        }*/
+                
+
+        
+
+        
+
+        
+
+        
+
+
+
+
+
+        // GUSTAVO //
 
         public async Task<dynamic> GetLogin(Login login)
         {   
@@ -343,6 +716,8 @@ namespace webAPI.DAO
             return await resposta.ToListAsync();
 
             }
+
+    // VINICIUS //
         public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
         {
                 Guid idTerceiro, idBeneficiario;
@@ -421,6 +796,8 @@ namespace webAPI.DAO
                 }
 
         }
+
+        
     }
     
 }
