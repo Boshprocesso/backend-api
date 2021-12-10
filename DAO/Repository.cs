@@ -103,8 +103,12 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
         public async Task inserirBeneficio(Beneficio beneficio){
+            Beneficio? beneficiosNatabela = _context.Beneficios.Where(bnt => bnt.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
 
-            _context.Beneficios.Add(beneficio);
+            if(beneficiosNatabela == null) {
+                _context.Beneficios.Add(beneficio);
+            }
+
             await _context.SaveChangesAsync();
         }
         public async Task DeletarBeneficio (Guid BeneficioId){
@@ -228,11 +232,18 @@ namespace webAPI.DAO
                 where b.DescricaoBeneficio == beneficio.DescricaoBeneficio 
                 select b.IdBeneficio).First();
 
-            EventoBeneficio ev = new EventoBeneficio();
-            ev.IdEvento = EventoId;
-            ev.IdBeneficio = query;
+            EventoBeneficio? eventoBeneficioNaTabela = consulta.Where(bb =>
+                bb.IdBeneficio == query && bb.IdEvento == EventoId).FirstOrDefault();
+            
+            if(eventoBeneficioNaTabela == null)
+            {
+                EventoBeneficio ev = new EventoBeneficio();
+                ev.IdEvento = EventoId;
+                ev.IdBeneficio = query;
+                
+                _context.EventoBeneficios.Add(ev);
+            }
 
-            _context.EventoBeneficios.Add(ev);
             await _context.SaveChangesAsync();
             
         }
@@ -918,26 +929,27 @@ namespace webAPI.DAO
             }
             
             try {
-                string buscarIdentificacao;
+                string cpf;
+                int? edv;
 
                 if(identificacao.Length != 11) {
-                    buscarIdentificacao = 
+                    edv = Convert.ToInt32(identificacao);
+                    cpf = 
                     (from beneficiario in Beneficiarios
                     where beneficiario.Edv == Convert.ToInt32(identificacao)
                     select beneficiario.Cpf).First();
                 } else {
-                    buscarIdentificacao = identificacao.Trim();
-                    if(buscarIdentificacao.Length == 11)
-                {
-                    buscarIdentificacao = buscarIdentificacao.Insert(9,"-");
-                    buscarIdentificacao = buscarIdentificacao.Insert(6,".");
-                    buscarIdentificacao = buscarIdentificacao.Insert(3,".");
-                }
+                    cpf = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+
+                    edv = 
+                    (from beneficiario in Beneficiarios
+                    where beneficiario.Edv == Convert.ToInt32(identificacao)
+                    select beneficiario.Edv).First();
                 }
 
                 idTerceiro = 
                     (from terceiro in Terceiros
-                    where terceiro.Identificacao == buscarIdentificacao
+                    where terceiro.Identificacao == cpf || terceiro.Identificacao == Convert.ToString(edv)
                     select terceiro.IdTerceiro).First();
             } catch {
                 idTerceiro = Guid.Empty;
