@@ -327,8 +327,8 @@ namespace webAPI.DAO
                                         where bb.IdBeneficiario == elem
                                         select new
                                         {
-                                            idProduto = b.IdBeneficio,
-                                            beneficio = b.DescricaoBeneficio,
+                                            idBeneficio = b.IdBeneficio,
+                                            descricaoBeneficio = b.DescricaoBeneficio,
                                             status = bb.Entregue,
                                             quantidade = bb.Quantidade
                                         });
