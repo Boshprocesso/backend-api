@@ -17,10 +17,16 @@ namespace webAPI.DAO
             _context = context;
         }
 
+        public async Task<Beneficiario[]> GetAllBeneficiarios()
+        {
+            IQueryable<Beneficiario> query = _context.Beneficiarios;
+            query = query.AsNoTracking().OrderBy(c => c.IdBeneficiario);
+            return await query.ToArrayAsync();
+        }
         public async Task<bool> SaveChangesAsync()
         {
-            return (await _context.SaveChangesAsync()) > 0;}
-        
+            return (await _context.SaveChangesAsync()) > 0;
+        }
         
 // EVENTOS
         public async Task<Evento[]> GetAllEventos()
@@ -136,15 +142,11 @@ namespace webAPI.DAO
             IQueryable<EventoBeneficio> consultabb = _context.EventoBeneficios; 
             IQueryable<Beneficio> benefconsultabb = _context.Beneficios;
 
-            var query = (
+            IQueryable<Beneficio> query = (
                 from b in benefconsultabb                
                 join eb in consultabb on b.IdBeneficio equals eb.IdBeneficio
                 where eb.IdEvento == EventoId
-                select new  {
-                    IdEvento = eb.IdEvento,
-                    IdBeneficio = b.IdBeneficio,
-                    descricaoBeneficio = b.DescricaoBeneficio
-                });
+                select b);
 
             query = query.AsNoTracking().OrderBy(c => c.IdBeneficio);         
             return await query.ToArrayAsync();    
@@ -722,8 +724,10 @@ namespace webAPI.DAO
                              };
 
             return await resposta.ToListAsync();
+        }
 
-            }
+
+            
 
         public async Task<dynamic> GetTerceiro(Guid cod)
         {
@@ -858,83 +862,271 @@ namespace webAPI.DAO
                                                                                         nomeTerceiro = " "
                                                                                      }));
         }
-        public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
+
+
+        public async Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao)
+
         {
-                Guid idTerceiro, idBeneficiario;
-                
-                try {
-                    if(identificacao.Length < 14) {
-                        idBeneficiario = 
-                        (from beneficiario in _context.Beneficiarios.AsNoTracking()
-                        where beneficiario.Edv == Convert.ToInt32(identificacao)
+            IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
+            IQueryable<EventoBeneficio> EventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<EventoBeneficiario> EventoBeneficiarios = _context.EventoBeneficiarios.AsNoTracking();
+            IQueryable<IlhaBeneficio> ilhaBeneficios = _context.IlhaBeneficios.AsNoTracking();
+            IQueryable<Beneficiario> Beneficiarios = _context.Beneficiarios.AsNoTracking();
+            IQueryable<Beneficio> Beneficios = _context.Beneficios.AsNoTracking();
+            IQueryable<Terceiro> Terceiros = _context.Terceiros.AsNoTracking();
+            Guid idTerceiro, idBeneficiario;
+            
+            try {
+                if(identificacao.Length != 11) {
+                    idBeneficiario = 
+                    (from beneficiario in Beneficiarios
+                    where beneficiario.Edv == Convert.ToInt32(identificacao)
+                    select beneficiario.IdBeneficiario).First();
+                }else {
+                    string buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+
+                    idBeneficiario = 
+                        (from beneficiario in Beneficiarios
+                        where beneficiario.Cpf == buscarIdentificacao
                         select beneficiario.IdBeneficiario).First();
-                    }else {
-                        idBeneficiario = 
-                            (from beneficiario in _context.Beneficiarios.AsNoTracking()
-                            where beneficiario.Cpf == identificacao
-                            select beneficiario.IdBeneficiario).First();
-                    }
-                } catch {
-                    idBeneficiario = Guid.Empty;
                 }
-                
-                try {
-                    if(identificacao.Length < 14) {
-                        identificacao = 
-                        (from beneficiario in _context.Beneficiarios.AsNoTracking()
-                        where beneficiario.Edv == Convert.ToInt32(identificacao)
-                        select beneficiario.Cpf).First();
-                    }
-                    idTerceiro = 
-                        (from terceiro in _context.Terceiros.AsNoTracking()
-                        where terceiro.Identificacao == identificacao
-                        select terceiro.IdTerceiro).First();
-                } catch {
-                    idTerceiro = Guid.Empty;
+            } catch {
+                idBeneficiario = Guid.Empty;
+            }
+            
+            try {
+                string buscarIdentificacao;
+
+                if(identificacao.Length != 11) {
+                    buscarIdentificacao = 
+                    (from beneficiario in Beneficiarios
+                    where beneficiario.Edv == Convert.ToInt32(identificacao)
+                    select beneficiario.Cpf).First();
+                } else {
+                    buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
                 }
 
-                IQueryable<BeneficiarioBeneficioResgatar> query =
-                from beneficiario in _context.Beneficiarios.AsNoTracking()
-                join beneficiarioBeneficio in _context.BeneficiarioBeneficios
-                on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
-                join beneficio in _context.Beneficios
-                on beneficiarioBeneficio.IdBeneficio equals beneficio.IdBeneficio
-                where beneficiarioBeneficio.Entregue == "0" && 
-                    (beneficiarioBeneficio.IdBeneficiario == idBeneficiario || beneficiarioBeneficio.IdTerceiro == idTerceiro)
-                select new BeneficiarioBeneficioResgatar {
-                    Beneficio = beneficio.DescricaoBeneficio,
-                    IdBeneficio = beneficio.IdBeneficio,
-                    Quantidade = beneficiarioBeneficio.Quantidade,
-                    IdBeneficiario = beneficiario.IdBeneficiario,
-                    Beneficiario = beneficiario.NomeCompleto
+                idTerceiro = 
+                    (from terceiro in Terceiros
+                    where terceiro.Identificacao == buscarIdentificacao
+                    select terceiro.IdTerceiro).First();
+            } catch {
+                idTerceiro = Guid.Empty;
+            }
 
-                };
+            var query =
+            from beneficiario in Beneficiarios
+            join beneficiarioBeneficio in BeneficiarioBeneficios
+            on beneficiario.IdBeneficiario equals beneficiarioBeneficio.IdBeneficiario
+            join beneficio in Beneficios
+            on beneficiarioBeneficio.IdBeneficio equals beneficio.IdBeneficio
+            where (beneficiarioBeneficio.IdBeneficiario == idBeneficiario
+                    || beneficiarioBeneficio.IdTerceiro == idTerceiro)
+            select new {
+                Beneficio = beneficio.DescricaoBeneficio,
+                IdBeneficio = beneficio.IdBeneficio,
+                Quantidade = beneficiarioBeneficio.Quantidade,
+                Entregue = beneficiarioBeneficio.Entregue,
+                IdBeneficiario = beneficiario.IdBeneficiario,
+                Beneficiario = beneficiario.NomeCompleto
+            };
 
-                return await query.ToArrayAsync();
+            query = query.Where(result => 
+                EventoBeneficiarios.Any(eb => eb.IdEvento == idEvento && eb.IdBeneficiario == result.IdBeneficiario));
+            
+            query = query.Where(result => 
+                EventoBeneficios.Any(eb => eb.IdEvento == idEvento && eb.IdBeneficio == result.IdBeneficio));
+            
+            query = query.Where(result => 
+                ilhaBeneficios.Any(eb => eb.IdIlha == idIlha && eb.IdBeneficio == result.IdBeneficio));
+
+            return await query.ToArrayAsync();
         }
 
-        public void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
+        public void entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue)
         {
-            var BeneficiariosIds = beneficiosEntregues.Select(b => b.IdBeneficiario);
+            IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
 
-                IQueryable<BeneficiarioBeneficio> updateQuery =
-                from beneficiarioBeneficio in _context.BeneficiarioBeneficios.AsNoTracking()
-                where BeneficiariosIds.Contains(beneficiarioBeneficio.IdBeneficiario)
+            var beneficioTabela =
+                (from beneficiarioBeneficio in BeneficiarioBeneficios
+                where beneficioEntregue.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario && beneficioEntregue.IdBeneficio == beneficiarioBeneficio.IdBeneficio
                     && beneficiarioBeneficio.Entregue == "0"
-                select beneficiarioBeneficio;
-                
-                foreach (BeneficiarioBeneficio beneficiarioBeneficio in updateQuery)
-                {
-                    bool BeneficioCorreto = beneficiosEntregues.Any(
-                        b => b.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
-                            && b.IdBeneficio == beneficiarioBeneficio.IdBeneficio);
+                select beneficiarioBeneficio).FirstOrDefault();
 
-                    if(BeneficioCorreto) {
-                        beneficiarioBeneficio.Entregue = "1";
-                        _context.BeneficiarioBeneficios.Update(beneficiarioBeneficio);
+                if(beneficioTabela != null) {
+                    beneficioTabela.Entregue = "1";
+                    _context.BeneficiarioBeneficios.Update(beneficioTabela);
+                }
+        }
+
+        public async Task carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> BeneficiariosParaInserir)
+        {
+            IQueryable<EventoBeneficiario> eventoBeneficiarios = _context.EventoBeneficiarios.AsNoTracking();
+            IQueryable<Beneficiario> beneficiarios = _context.Beneficiarios.AsNoTracking();
+
+            List<Beneficiario> beneficiariosDoEvento = (
+                from beneficiario in beneficiarios
+                join eventoBeneficiario in eventoBeneficiarios
+                on beneficiario.IdBeneficiario equals eventoBeneficiario.IdBeneficiario
+                where eventoBeneficiario.IdEvento == idEvento
+                select beneficiario
+            ).ToList();
+            
+            BeneficiariosParaInserir = BeneficiariosParaInserir.Where(bpi => !beneficiariosDoEvento.Any(b => b.Cpf == bpi.cpf)).ToList();
+            
+            List<Beneficiario> beneficiariosRelacao = new List<Beneficiario>();
+            foreach (var novoBeneficiario in BeneficiariosParaInserir)
+            {
+                Beneficiario beneficiario = new Beneficiario {
+                    NomeCompleto = novoBeneficiario.nome,
+                    Cpf = novoBeneficiario.cpf,
+                    Edv = novoBeneficiario.edv,
+                    Unidade = novoBeneficiario.unidade,
+                    DataNascimento = novoBeneficiario.nascimento,
+                    DataInclusao = DateTime.Now,
+                    ResponsavelInclusao = "Import Process"
+                };
+
+                var beneficiarioRepetido = beneficiariosRelacao
+                    .Any(beneficiarioNaLista => beneficiarioNaLista.Cpf == beneficiario.Cpf);
+
+                if(!beneficiarioRepetido)
+                {
+                    var beneficiarioNaTabela = beneficiarios
+                        .Where(beneficiarioNaTabela => beneficiarioNaTabela.Cpf == beneficiario.Cpf).FirstOrDefault();
+
+                    if(beneficiarioNaTabela == null)
+                    {
+                        beneficiariosRelacao.Add(beneficiario);
+                        _context.Beneficiarios.Add(beneficiario);
+                    }else {
+                        beneficiariosRelacao.Add(beneficiarioNaTabela);
                     }
                 }
+            }
 
+            await _context.SaveChangesAsync();
+
+            foreach (Beneficiario beneficiario in beneficiariosRelacao)
+            {
+                EventoBeneficiario eventoBeneficiario = new EventoBeneficiario {
+                    IdEvento = idEvento,
+                    IdBeneficiario = beneficiario.IdBeneficiario
+                };
+
+                _context.EventoBeneficiarios.Add(eventoBeneficiario);
+            }
+            
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task carregarBeneficios(Guid idEvento, List<string> BeneficiosParaInserir)
+        {
+            IQueryable<EventoBeneficio> eventoBeneficios = _context.EventoBeneficios.AsNoTracking();
+            IQueryable<Beneficio> beneficios = _context.Beneficios.AsNoTracking();
+
+            List<Beneficio> beneficiosDoEvento = (
+                from beneficio in beneficios
+                join EventoBeneficio in eventoBeneficios
+                on beneficio.IdBeneficio equals EventoBeneficio.IdBeneficio
+                where EventoBeneficio.IdEvento == idEvento
+                select beneficio
+            ).ToList();
+            
+            BeneficiosParaInserir = BeneficiosParaInserir.Where(bpi => !beneficiosDoEvento.Any(b => b.DescricaoBeneficio == bpi)).ToList();
+            
+            List<Beneficio> beneficiosRelacao = new List<Beneficio>();
+            foreach (var descricaoBeneficio in BeneficiosParaInserir)
+            {
+                Beneficio beneficio = new Beneficio {
+                    DescricaoBeneficio = descricaoBeneficio
+                };
+
+                var beneficioRepetido = beneficiosRelacao
+                    .Any(beneficioNaLista => beneficioNaLista.DescricaoBeneficio == beneficio.DescricaoBeneficio);
+
+                if(!beneficioRepetido)
+                {
+                    var beneficioNaTabela = beneficios
+                        .Where(beneficioNaTabela => beneficioNaTabela.DescricaoBeneficio == beneficio.DescricaoBeneficio).FirstOrDefault();
+
+                    if(beneficioNaTabela == null)
+                    {
+                        beneficiosRelacao.Add(beneficio);
+                        _context.Beneficios.Add(beneficio);
+                    }else {
+                        beneficiosRelacao.Add(beneficioNaTabela);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            foreach (Beneficio beneficio in beneficiosRelacao)
+            {
+                EventoBeneficio eventoBeneficio = new EventoBeneficio {
+                    IdEvento = idEvento,
+                    IdBeneficio = beneficio.IdBeneficio
+                };
+
+                _context.EventoBeneficios.Add(eventoBeneficio);
+            }
+            
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario)
+        {
+            IQueryable<BeneficiarioBeneficio> beneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
+
+            List<Beneficiario> beneficiariosDoEvento = (
+                from beneficiario in _context.Beneficiarios.AsNoTracking()
+                join eventoBeneficiario in _context.EventoBeneficiarios.AsNoTracking()
+                on beneficiario.IdBeneficiario equals eventoBeneficiario.IdBeneficiario
+                where eventoBeneficiario.IdEvento == idEvento
+                select beneficiario
+            ).ToList();
+
+            List<Beneficio> beneficiosDoEvento = (
+                from beneficio in _context.Beneficios.AsNoTracking()
+                join EventoBeneficio in _context.EventoBeneficios.AsNoTracking()
+                on beneficio.IdBeneficio equals EventoBeneficio.IdBeneficio
+                where EventoBeneficio.IdEvento == idEvento
+                select beneficio
+            ).ToList();
+
+            foreach (KeyValuePair<string, List<CpfQuantidade>> entrada in BeneficioBeneficiario)
+            {
+                Beneficio? beneficio = beneficiosDoEvento.Where(b => b.DescricaoBeneficio == entrada.Key).FirstOrDefault();
+
+                if(beneficio != null) {
+                    foreach (CpfQuantidade cpfQuantidade in entrada.Value)
+                    {
+                        Beneficiario beneficiario = beneficiariosDoEvento.Where(b => b.Cpf == cpfQuantidade.cpf).First();
+
+                        BeneficiarioBeneficio beneficiarioBeneficio = new BeneficiarioBeneficio {
+                            IdBeneficiario = beneficiario.IdBeneficiario,
+                            IdBeneficio = beneficio.IdBeneficio,
+                            Quantidade = cpfQuantidade.Quantidade
+                        };
+
+                        var local = _context.BeneficiarioBeneficios.Local
+                            .FirstOrDefault(beneficiarioBeneficioLocal => beneficiarioBeneficioLocal.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
+                                && beneficiarioBeneficioLocal.IdBeneficio == beneficiarioBeneficio.IdBeneficio);
+
+                        var beneficiarioBeneficioNaTabela = beneficiarioBeneficios
+                            .Where(beneficiarioBeneficioNaTabela => beneficiarioBeneficioNaTabela.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
+                                && beneficiarioBeneficioNaTabela.IdBeneficio == beneficiarioBeneficio.IdBeneficio).FirstOrDefault();
+
+                        if(beneficiarioBeneficioNaTabela == null && local == null)
+                        {
+                            _context.BeneficiarioBeneficios.Add(beneficiarioBeneficio);
+                        }
+                    }
+                }
+            }
+            
+            await _context.SaveChangesAsync();
         }
 
         

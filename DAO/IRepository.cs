@@ -7,7 +7,7 @@ namespace webAPI.DAO
     {
         
         Task<bool> SaveChangesAsync();
-        
+        Task<Beneficiario[]> GetAllBeneficiarios();
 
         
 
@@ -64,6 +64,7 @@ namespace webAPI.DAO
 
         Task<dynamic> GetColaboradorbyId(Guid ColabId);
 
+
         //Colaborador - Beneficio
 
         Task inserirBeneficioColaborador(int edv,Beneficio beneficio);
@@ -112,9 +113,20 @@ namespace webAPI.DAO
         //VINICIUS
         
         
-        Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao);
-        void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
 
+
+
+        //Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio);
+
+        Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao);
         
+        void entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue);
+
+        Task carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> Beneficiarios);
+
+        Task carregarBeneficios(Guid idEvento, List<string> Beneficios);
+
+        Task carregarBeneficiarioBeneficio(Guid idEvento, Dictionary<string, List<CpfQuantidade>> BeneficioBeneficiario);
+
     }
 }
