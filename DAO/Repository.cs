@@ -456,29 +456,61 @@ namespace webAPI.DAO
         // EVENTO -> COLABORADOR
 
         public async Task<dynamic> GetAllBeneficiariosEvento(Guid EventoId)
-        {
+        { 
+            List<Beneficiario> ColaboradoresEvento = (
+                from beneficiarios in _context.Beneficiarios                
+                join beneficiariosEvento in _context.EventoBeneficiarios on beneficiarios.IdBeneficiario  equals beneficiariosEvento.IdBeneficiario            
+                where beneficiariosEvento.IdEvento == EventoId                 
+                select beneficiarios).ToList();
+            
+            List<BenficiarioAux> ListacompletaColaboradoresEvento = new List<BenficiarioAux>();
+            
+            
+            foreach (Beneficiario colaborador in ColaboradoresEvento)
+            {
+                BenficiarioAux beneficiarioaux = new BenficiarioAux();
+                
+                beneficiarioaux.EventoId = EventoId;
+                beneficiarioaux.colaborador = colaborador;                
+                beneficiarioaux.ListaBeneficios = (                                    
+                                            from benficioscolaborador in  _context.BeneficiarioBeneficios 
+                                            join beneficios in _context.Beneficios on benficioscolaborador.IdBeneficio equals beneficios.IdBeneficio
+                                            where benficioscolaborador.IdBeneficiario == colaborador.IdBeneficiario && benficioscolaborador.IdBeneficio == beneficios.IdBeneficio
+                                        select new
+                                        {                                       
+                                        idproduto = beneficios.IdBeneficio,
+                                        descricao = beneficios.DescricaoBeneficio,
+                                        quantidade = benficioscolaborador.Quantidade,
+                                        status = benficioscolaborador.Entregue}).ToList<dynamic>();
+                
+                ListacompletaColaboradoresEvento.Add(beneficiarioaux);
+                                        
+                
+
+            }
+         return ListacompletaColaboradoresEvento;      
+                
+        }
+
+               
+            
+            
+            
             
 
-            IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios; 
-            IQueryable<Beneficiario> consultaColab = _context.Beneficiarios;
 
-            var query = (
-                from b in consultaColab               
-                join eb in consultaeb on b.IdBeneficiario equals eb.IdBeneficiario
-                where eb.IdEvento == EventoId
-                select new  {
+            
+
+            
+            
+            
+
+
                     
-                    IdEvento = eb.IdEvento,
-                    Edv = b.Edv,
-                    NomeCompleto = b.NomeCompleto,
-                    Cpf = b.Cpf,                    
-                    Unidade=b.Unidade,                
-                    DataInclusao = b.DataInclusao                    
-                });
+           
+        
 
-            query = query.OrderBy(c => c.Edv);         
-            return await query.ToArrayAsync();
-        }
+        
 
         public async Task inserirBeneficiarioEvento(Guid EventoId,int edv){
 
@@ -556,32 +588,7 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
-        /*public async Task <dynamic> GetAllBeneficiariosBeneficiosFromEvento(Guid EventoId){
-
-            //GetBeneficiariosEvento
-            IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios; 
-            IQueryable<Beneficiario> consultaColab = _context.Beneficiarios;
-
-            var query = (
-                from eb in consultaeb              
-                where eb.IdEvento == EventoId
-                select eb.IdBeneficiario).ToList();
-
-            //GetEventoBeneficiario
-                        
-
-            foreach( Guid colab in query){
-                await GetColaboradorbyId(colab);
-                GetBeneficiosFromColaborador
-                
-            }
-
-            
-
-                
-
-            
-        }*/
+        
                 
 
         
@@ -1128,6 +1135,8 @@ namespace webAPI.DAO
             
             await _context.SaveChangesAsync();
         }
+
+
 
         
     }

@@ -71,11 +71,7 @@ namespace webAPI.DAO
 
         Task<dynamic> GetBeneficiosFromColaborador(int edv); 
 
-        //Task<dynamic> GetUmBeneficioFromColaboradorbyId(Guid BeneficiarioId, Guid BeneficioId);//FALTA
-
-        //Task<dynamic> GetUmBeneficioFromColaborador(Guid BeneficiarioId, Beneficio beneficio);//FALTA          
-
-        //Task RemoverUmBeneficioFromColaborador(Guid BeneficiarioId, Guid BeneficioId);//FALTA
+        
 
         Task RemoverColaboradorfromBeneficiarioBeneficios(int edv); 
 
@@ -86,17 +82,18 @@ namespace webAPI.DAO
 
         Task<dynamic> GetUmColaboradorFromEventobyEdv(Guid EventoId, int edv);
 
-        //Task<dynamic> GetUmColaboradorFromEvento(Guid EventoId, Beneficiario colaborador);//FALTA          
+                  
 
        Task RemoverUmBeneficiarioFromEvento(Guid EventoId, int edv); 
-        Task inserirBeneficiarioEvento(Guid EventoId,int edv);
-        //Task RemoverEventoFromEventoColaborador(Guid EventoId);
+        Task inserirBeneficiarioEvento(Guid EventoId,int edv); // Arrumar
+        
 
         //Evento -> Beneficiario -> Beneficio
 
 
 
-       // Task <dynamic> GetAllBeneficiariosBeneficiosFromEvento(Guid EventoId); 
+
+       
 
 
         //GUSTAVO
@@ -116,7 +113,6 @@ namespace webAPI.DAO
 
 
 
-        //Task editarBenficioFromEvento(Guid EvendoId, Guid BeneficioId, Beneficio Descbeneficio);
 
         Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao);
         
