@@ -322,7 +322,7 @@ namespace webAPI.DAO
 
         }
         public async Task inserirColaborador(Beneficiario colaborador){
-            Beneficiario? colaboradorNatabela = _context.Beneficiarios.Where(bnt => bnt.Cpf == colaborador.Cpf).FirstOrDefault();
+            Beneficiario? colaboradorNatabela = _context.Beneficiarios.Where(bnt => bnt.Edv == colaborador.Edv || bnt.Cpf == colaborador.Cpf).FirstOrDefault();
 
             if(colaboradorNatabela == null) {
                 _context.Beneficiarios.Add(colaborador);
