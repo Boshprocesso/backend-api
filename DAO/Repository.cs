@@ -728,9 +728,6 @@ namespace webAPI.DAO
 
             }
 
-<<<<<<< HEAD
-    // VINICIUS //
-=======
         public async Task<dynamic> GetTerceiro(Guid cod)
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios;
@@ -864,7 +861,6 @@ namespace webAPI.DAO
                                                                                         nomeTerceiro = " "
                                                                                      }));
         }
->>>>>>> 5a574cda921c3945881d356c9ded9e977b7a7aef
         public async Task<BeneficiarioBeneficioResgatar[]> GetBeneficiosParaEntregar(string identificacao)
         {
                 Guid idTerceiro, idBeneficiario;

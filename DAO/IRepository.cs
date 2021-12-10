@@ -27,7 +27,6 @@ namespace webAPI.DAO
 
         Task<Beneficio[]> GetAllBeneficios();
 
-        Task<dynamic> GetBeneficios(Guid cod);
         Task inserirBeneficio(Beneficio beneficio);
         Task editarBenficio(Guid BeneficioId,Beneficio Descbeneficio); // Edita na tabalea Beneficio
         Task<dynamic> GetBeneficiobyId(Guid BeneficioId);
