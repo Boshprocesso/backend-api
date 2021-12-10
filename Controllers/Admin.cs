@@ -39,6 +39,7 @@ namespace webAPI.Controllers
         {
             try{
                 var result = await _repo.GetEventobyId(EventoId);
+                await _repo.RemoverEventoFromEventoBeneficiario(EventoId);
                 await _repo.RemoverEventoFromEventoBeneficio(EventoId);
                 await _repo.RemoverEvento(EventoId);
                 return Ok(result);

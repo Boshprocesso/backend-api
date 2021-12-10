@@ -926,7 +926,13 @@ namespace webAPI.DAO
                     where beneficiario.Edv == Convert.ToInt32(identificacao)
                     select beneficiario.Cpf).First();
                 } else {
-                    buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+                    buscarIdentificacao = identificacao.Trim();
+                    if(buscarIdentificacao.Length == 11)
+                {
+                    buscarIdentificacao = buscarIdentificacao.Insert(9,"-");
+                    buscarIdentificacao = buscarIdentificacao.Insert(6,".");
+                    buscarIdentificacao = buscarIdentificacao.Insert(3,".");
+                }
                 }
 
                 idTerceiro = 
@@ -1164,9 +1170,18 @@ namespace webAPI.DAO
             await _context.SaveChangesAsync();
         }
 
+        public async Task RemoverEventoFromEventoBeneficiario(Guid EventoId){
 
+            IQueryable<EventoBeneficiario> consultaeb = _context.EventoBeneficiarios; 
+            
+            (from eb in consultaeb
+             where eb.IdEvento == EventoId select eb).ToList()
+                                                     .ForEach(eb => _context.EventoBeneficiarios.Remove(eb));
+            
+            await _context.SaveChangesAsync();
 
-        
+        }
+
     }
     
 }

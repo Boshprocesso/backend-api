@@ -104,6 +104,7 @@ namespace webAPI.DAO
         Task<dynamic> GetTerceiro(Guid cod);
         Task<dynamic> inserirTerceiro(TerceiroModel terceiro);
         Task<dynamic> removerTerceiro(Guid idBeneficiario, string identificacaoTerceiro);
+        Task RemoverEventoFromEventoBeneficiario(Guid EventoId);
 
            
 
