@@ -929,20 +929,27 @@ namespace webAPI.DAO
             }
             
             try {
-                string buscarIdentificacao;
+                string cpf;
+                int? edv;
 
                 if(identificacao.Length != 11) {
-                    buscarIdentificacao = 
+                    edv = Convert.ToInt32(identificacao);
+                    cpf = 
                     (from beneficiario in Beneficiarios
                     where beneficiario.Edv == Convert.ToInt32(identificacao)
                     select beneficiario.Cpf).First();
                 } else {
-                    buscarIdentificacao = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+                    cpf = Convert.ToUInt64(identificacao).ToString(@"000\.000\.000\-00");
+
+                    edv = 
+                    (from beneficiario in Beneficiarios
+                    where beneficiario.Edv == Convert.ToInt32(identificacao)
+                    select beneficiario.Edv).First();
                 }
 
                 idTerceiro = 
                     (from terceiro in Terceiros
-                    where terceiro.Identificacao == buscarIdentificacao
+                    where terceiro.Identificacao == cpf || terceiro.Identificacao == Convert.ToString(edv)
                     select terceiro.IdTerceiro).First();
             } catch {
                 idTerceiro = Guid.Empty;
