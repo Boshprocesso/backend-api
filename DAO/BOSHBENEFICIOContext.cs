@@ -32,7 +32,7 @@ namespace webAPI.DAO
             if (!optionsBuilder.IsConfigured)
             {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Integrated Security=SSPI;Persist Security Info=False;Data Source=LAPTOP-7IG3QRH4;Initial Catalog=BOSHBENEFICIO");
+                optionsBuilder.UseSqlServer("workstation id=BOSHBENEFICIO.mssql.somee.com;packet size=4096;user id=grupobosch04_SQLLogin_1;pwd=tx4pa7olx8;data source=BOSHBENEFICIO.mssql.somee.com;persist security info=False;initial catalog=BOSHBENEFICIO;");
             }
         }
 
