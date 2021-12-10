@@ -423,28 +423,20 @@ namespace webAPI.DAO
             return await query.ToArrayAsync();
         }
 
-        public void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
+        public void entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue)
         {
             IQueryable<BeneficiarioBeneficio> BeneficiarioBeneficios = _context.BeneficiarioBeneficios.AsNoTracking();
-            var BeneficiariosIds = beneficiosEntregues.Select(b => b.IdBeneficiario);
 
-            var query =
-                from beneficiarioBeneficio in BeneficiarioBeneficios
-                where BeneficiariosIds.Contains(beneficiarioBeneficio.IdBeneficiario)
+            var beneficioTabela =
+                (from beneficiarioBeneficio in BeneficiarioBeneficios
+                where beneficioEntregue.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario && beneficioEntregue.IdBeneficio == beneficiarioBeneficio.IdBeneficio
                     && beneficiarioBeneficio.Entregue == "0"
-                select beneficiarioBeneficio;
-            
-            foreach (BeneficiarioBeneficio beneficiarioBeneficio in query)
-            {
-                bool BeneficioCorreto = beneficiosEntregues.Any(
-                    b => b.IdBeneficiario == beneficiarioBeneficio.IdBeneficiario
-                        && b.IdBeneficio == beneficiarioBeneficio.IdBeneficio);
+                select beneficiarioBeneficio).FirstOrDefault();
 
-                if(BeneficioCorreto) {
-                    beneficiarioBeneficio.Entregue = "1";
-                    _context.BeneficiarioBeneficios.Update(beneficiarioBeneficio);
+                if(beneficioTabela != null) {
+                    beneficioTabela.Entregue = "1";
+                    _context.BeneficiarioBeneficios.Update(beneficioTabela);
                 }
-            }
         }
 
         public async Task carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> BeneficiariosParaInserir)

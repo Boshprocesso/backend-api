@@ -35,19 +35,14 @@ namespace webAPI.Controllers
         }
         
         [HttpPost("/BeneficioEntregue")]
-        public async Task<IActionResult> entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues)
-        {
-            if(beneficiosEntregues.Count == 0)
-            {
-                return StatusCode(400, "Informe ao menos um benefício para entregua");
-            }
-            
+        public async Task<IActionResult> entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue)
+        {            
             try{
-                _repo.entregarBeneficios(beneficiosEntregues);
+                _repo.entregarBeneficios(beneficioEntregue);
 
                 if(await _repo.SaveChangesAsync())
                 {
-                    return Ok("Beneficios entregues");
+                    return Ok(new { messagem = "Beneficios entregues"});
                 }
             }
             catch (Exception ex){

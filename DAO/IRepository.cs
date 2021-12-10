@@ -42,7 +42,7 @@ namespace webAPI.DAO
 
         Task<dynamic> GetBeneficiosParaEntregar(Guid idEvento, Guid idIlha, string identificacao);
         
-        void entregarBeneficios(List<BeneficiarioBeneficioEntregar> beneficiosEntregues);
+        void entregarBeneficios(BeneficiarioBeneficioEntregar beneficioEntregue);
 
         Task carregarBeneficiarios(Guid idEvento, List<BeneficiarioPayload> Beneficiarios);
 
